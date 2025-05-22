@@ -1,1 +1,3 @@
 # seoro
+
+* seoroblue@gmail.com
