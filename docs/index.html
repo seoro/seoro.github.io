@@ -1,17 +1,1407 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>seoro</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>크로니펫 - 반려동물 건강 데이터 플랫폼</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f9fafb;
+      color: #1f2937;
+    }
+    
+    #app {
+      max-width: 480px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 80px;
+    }
+    
+    /* Header */
+    .header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    .header h1 {
+      font-size: 20px;
+      font-weight: bold;
+      color: #14b8a6;
+    }
+    
+    .header p {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    
+    /* Container */
+    .container {
+      padding: 16px;
+      background: #f9fafb;
+    }
+    
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .gradient-card {
+      background: linear-gradient(135deg, #5eead4 0%, #06b6d4 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    
+    .info-card {
+      background: linear-gradient(135deg, #fdf4ff 0%, #fce7f3 100%);
+      border: 1px solid #f0abfc;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background: #14b8a6;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #0d9488;
+    }
+    
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+    
+    .btn-full {
+      width: 100%;
+    }
+    
+    /* Grid */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    
+    .stat-box {
+      background: #f0fdfa;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+    
+    .stat-box.yellow {
+      background: #fefce8;
+    }
+    
+    .stat-box.teal {
+      background: #f0fdfa;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #14b8a6;
+    }
+    
+    .stat-value.yellow {
+      color: #eab308;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #0d9488;
+      margin-top: 4px;
+    }
+    
+    /* Alert */
+    .alert-danger {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .alert-content {
+      flex: 1;
+    }
+    
+    .allergy-tag {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 16px;
+      font-size: 12px;
+      margin-right: 6px;
+      margin-bottom: 4px;
+    }
+    
+    /* Quest */
+    .quest-item {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .quest-item.completed {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+    
+    .quest-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .quest-checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #d1d5db;
+      border-radius: 50%;
+    }
+    
+    .quest-checkbox.checked {
+      background: #22c55e;
+      border-color: #22c55e;
+      position: relative;
+    }
+    
+    .quest-checkbox.checked::after {
+      content: '✓';
+      color: white;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+    }
+    
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: white;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ec4899 0%, #a855f7 100%);
+      transition: width 0.3s;
+    }
+    
+    /* Star Rating */
+    .star-rating {
+      display: inline-flex;
+      gap: 2px;
+    }
+    
+    .star {
+      color: #d1d5db;
+      font-size: 12px;
+    }
+    
+    .star.filled {
+      color: #fbbf24;
+    }
+    
+    /* Product */
+    .product-item {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      transition: border-color 0.2s;
+    }
+    
+    .product-item:hover {
+      border-color: #14b8a6;
+    }
+    
+    .product-item.selected {
+      border-color: #14b8a6;
+      background: #f0fdfa;
+    }
+    
+    .product-img {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 2px solid #bae6fd;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #0369a1;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.2;
+    }
+    
+    .product-detail-img {
+      width: 192px;
+      height: 192px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 3px solid #bae6fd;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #0369a1;
+      font-weight: 600;
+      text-align: center;
+      margin: 0 auto;
+    }
+    
+    .product-info {
+      flex: 1;
+    }
+    
+    /* Ingredient Tags */
+    .ingredient-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    
+    .ingredient-tag {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .ingredient-tag:hover {
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .ingredient-tag.safe {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+    
+    .ingredient-tag.caution {
+      background: #fefce8;
+      color: #a16207;
+      border: 1px solid #fef08a;
+    }
+    
+    .ingredient-tag.warning {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    
+    /* Form */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #14b8a6;
+    }
+    
+    .stool-option {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .stool-option:hover {
+      border-color: #d1d5db;
+    }
+    
+    .stool-option.selected {
+      border-color: #14b8a6;
+      background: #f0fdfa;
+    }
+    
+    /* Search */
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      font-size: 18px;
+      color: #9ca3af;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 12px 12px 12px 40px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: #9ca3af;
+      transition: color 0.2s;
+    }
+    
+    .nav-item.active {
+      color: #14b8a6;
+    }
+    
+    .nav-icon {
+      font-size: 20px;
+    }
+    
+    .nav-label {
+      font-size: 11px;
+    }
+    
+    /* Pet Selector */
+    .pet-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .pet-item:hover {
+      background: #f9fafb;
+    }
+    
+    .pet-item.active {
+      background: #f0fdfa;
+      border-color: #14b8a6;
+    }
+    
+    .pet-avatar {
+      font-size: 32px;
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1f2937;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 2000;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    
+    /* Community */
+    .post-item {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    
+    .post-item:hover {
+      border-color: #14b8a6;
+    }
+    
+    .post-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #5eead4 0%, #06b6d4 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .post-meta {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    
+    /* Keyword Bar */
+    .keyword-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .keyword-bar:last-child {
+      border-bottom: none;
+    }
+    
+    .keyword-progress {
+      width: 100%;
+      height: 6px;
+      background: #f3f4f6;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    
+    .keyword-progress-fill {
+      height: 100%;
+      background: #14b8a6;
+      transition: width 0.3s;
+    }
+    
+    .keyword-progress-fill.negative {
+      background: #ef4444;
+    }
+    
+    /* Utility */
+    .text-center { text-align: center; }
+    .mb-1 { margin-bottom: 4px; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-3 { margin-bottom: 12px; }
+    .mb-4 { margin-bottom: 16px; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .flex { display: flex; }
+    .flex-between { display: flex; justify-content: space-between; }
+    .flex-center { display: flex; align-items: center; }
+    .gap-2 { gap: 8px; }
+    .font-bold { font-weight: bold; }
+    .text-sm { font-size: 14px; }
+    .text-xs { font-size: 12px; }
+    .text-gray { color: #6b7280; }
+    .text-teal { color: #14b8a6; }
+    .text-red { color: #ef4444; }
+    .text-green { color: #22c55e; }
+  </style>
 </head>
 <body>
-    <h1>seoro</h1>
-    <div>
-        <p>서: 曙 (새벽 서)</p>
-        <p>로: 露 (이슬 로)</p>
+  <div id="app">
+    <!-- Header -->
+    <div class="header">
+      <h1>크로니펫</h1>
+      <p>반려동물 건강 데이터 플랫폼</p>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Main Content -->
+    <div v-if="currentPage === 'home'" class="container">
+      <div class="gradient-card">
+        <div class="flex-between">
+          <div>
+            <p style="opacity: 0.9; font-size: 14px;">안녕하세요!</p>
+            <h2 style="font-size: 24px; font-weight: bold; margin-top: 4px;">{{ currentPet.name }}의 건강 기록</h2>
+            <p style="font-size: 12px; opacity: 0.8; margin-top: 4px;">
+              {{ currentPet.breed }} • {{ currentPet.age }}살 • {{ currentPet.weight }}kg
+            </p>
+          </div>
+          <div style="font-size: 48px;">🏆</div>
+        </div>
+        <div style="margin-top: 16px; display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 14px;">내 마일리지</span>
+          <span style="font-size: 28px; font-weight: bold;">{{ mileage.toLocaleString() }}P</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex-between mb-3">
+          <h3 class="font-bold">오늘의 {{ currentPet.name }}</h3>
+          <span class="text-xs text-gray">최근 3일 기준</span>
+        </div>
+        <div class="grid-3">
+          <div class="stat-box">
+            <div class="stat-value">{{ normalStoolRate }}%</div>
+            <div class="stat-label">변 정상률</div>
+          </div>
+          <div class="stat-box yellow">
+            <div class="star-rating">
+              <span v-for="i in 5" :key="i" class="star" :class="{filled: i <= 4}">★</span>
+            </div>
+            <div class="stat-label" style="color: #ca8a04;">평균 기호성</div>
+          </div>
+          <div class="stat-box teal">
+            <div class="stat-value">{{ records.length }}</div>
+            <div class="stat-label">총 기록일</div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="currentPet.allergies.length > 0" class="alert-danger">
+        <span style="font-size: 24px;">⚠️</span>
+        <div class="alert-content">
+          <p class="font-bold" style="color: #991b1b; margin-bottom: 8px;">{{ currentPet.name }}의 알러지 성분</p>
+          <div>
+            <span v-for="(allergy, i) in currentPet.allergies" :key="i" class="allergy-tag">
+              {{ allergy }}
+            </span>
+          </div>
+          <p class="text-xs" style="color: #dc2626; margin-top: 8px;">
+            제품 선택 시 이 성분들이 포함되지 않았는지 확인해주세요
+          </p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <p class="text-sm font-bold" style="color: #a855f7;">💕 기록할수록 {{ currentPet.name }}와 더 오래, 행복하게!</p>
+        <div class="progress-bar">
+          <div class="progress-fill" :style="{width: (records.length / 50 * 100) + '%'}"></div>
+        </div>
+        <p class="text-xs mt-2" style="color: #a855f7;">
+          지금까지 {{ records.length }}건의 기록으로 펫푸드 문화 개선에 기여했어요! 🎉
+        </p>
+      </div>
+
+      <div>
+        <h3 class="font-bold mb-3" style="font-size: 18px;">이번 주 퀘스트</h3>
+        <div v-for="quest in quests" :key="quest.id" class="quest-item" :class="{completed: quest.completed}">
+          <div class="quest-left">
+            <div class="quest-checkbox" :class="{checked: quest.completed}"></div>
+            <div>
+              <p class="font-bold" :style="{textDecoration: quest.completed ? 'line-through' : 'none', color: quest.completed ? '#9ca3af' : '#1f2937'}">
+                {{ quest.title }}
+              </p>
+              <p class="text-sm text-teal">+{{ quest.reward }}P</p>
+            </div>
+          </div>
+          <span style="color: #d1d5db;">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quest Page -->
+    <div v-if="currentPage === 'quest'" class="container">
+      <h2 class="font-bold mb-4" style="font-size: 24px;">주간 퀘스트</h2>
+      
+      <div style="background: #f0fdfa; border: 1px solid #5eead4; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+        <p class="text-sm" style="color: #0f766e;">이번 주 완료율</p>
+        <div class="progress-bar" style="background: white; margin-top: 8px;">
+          <div style="height: 100%; background: #14b8a6; transition: width 0.3s;" :style="{width: completionRate + '%'}"></div>
+        </div>
+        <p class="text-sm text-teal text-right mt-2">{{ completedQuests }}/{{ quests.length }} 완료</p>
+      </div>
+
+      <div v-for="quest in quests" :key="quest.id" class="card">
+        <div class="flex-between">
+          <div style="flex: 1;">
+            <h3 class="font-bold" style="font-size: 18px; margin-bottom: 4px;">{{ quest.title }}</h3>
+            <p class="text-sm text-gray">Week {{ quest.week }} 미션</p>
+            <div class="flex-center gap-2 mt-3">
+              <span style="font-size: 16px;">🏆</span>
+              <span class="text-teal font-bold">+{{ quest.reward }}P</span>
+            </div>
+          </div>
+          <button 
+            @click="quest.id === 1 ? showRecordForm = true : completeQuest(quest.id)"
+            :disabled="quest.completed"
+            class="btn"
+            :class="quest.completed ? 'btn-secondary' : 'btn-primary'"
+            :style="{opacity: quest.completed ? 0.5 : 1, cursor: quest.completed ? 'not-allowed' : 'pointer'}"
+          >
+            {{ quest.completed ? '완료' : '시작' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Record Form Modal -->
+      <div v-if="showRecordForm" class="modal-overlay" @click.self="showRecordForm = false">
+        <div class="modal">
+          <h3 class="font-bold mb-4" style="font-size: 20px;">오늘의 급여 기록</h3>
+          
+          <div class="form-group">
+            <label class="form-label">제품명</label>
+            <input v-model="formData.product" type="text" class="form-input" placeholder="예: 로얄캐닌 소형견">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">변 상태 (5단계 분류)</label>
+            <div v-for="level in 5" :key="level" 
+                 @click="formData.stool = level"
+                 class="stool-option"
+                 :class="{selected: formData.stool === level}">
+              <div class="flex-between">
+                <div style="flex: 1;">
+                  <p class="font-bold" :style="{color: stoolColors[level]}">
+                    {{ level }}단계: {{ stoolTypes[level].label }}
+                  </p>
+                  <p class="text-xs text-gray">{{ stoolTypes[level].desc }}</p>
+                </div>
+                <span v-if="formData.stool === level" style="color: #14b8a6; font-size: 20px;">✓</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">기호성 ({{ formData.preference }}/5)</label>
+            <input v-model.number="formData.preference" type="range" min="1" max="5" style="width: 100%;">
+            <div class="star-rating mt-2">
+              <span v-for="i in 5" :key="i" class="star" :class="{filled: i <= formData.preference}" style="font-size: 24px;">★</span>
+            </div>
+          </div>
+
+          <div class="flex gap-2 mt-4">
+            <button @click="showRecordForm = false" class="btn btn-secondary" style="flex: 1;">취소</button>
+            <button @click="submitRecord" class="btn btn-primary" style="flex: 1;">저장</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quest Complete Modal -->
+      <div v-if="showQuestComplete" class="modal-overlay">
+        <div class="modal text-center">
+          <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 40px;">
+            💕
+          </div>
+          <h3 class="font-bold mb-2" style="font-size: 24px;">퀘스트 완료!</h3>
+          <p class="text-gray mb-4">
+            {{ currentPet.name }}와 더 오래<br>행복한 시간을 누릴 수 있어요!
+          </p>
+          <div class="info-card">
+            <p class="text-teal font-bold">펫푸드 문화 개선에 기여했어요 🎉</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wiki Page -->
+    <div v-if="currentPage === 'wiki'" class="container">
+      <div v-if="!selectedProduct">
+        <div class="flex-between mb-4">
+          <h2 class="font-bold" style="font-size: 24px;">제품 위키</h2>
+          <button @click="compareMode = !compareMode" class="btn" :class="compareMode ? 'btn-primary' : 'btn-secondary'">
+            {{ compareMode ? '비교 완료' : '제품 비교' }}
+          </button>
+        </div>
+
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input v-model="searchTerm" type="text" class="search-input" placeholder="제품명 또는 브랜드 검색">
+        </div>
+
+        <div v-for="product in filteredProducts" :key="product.id"
+             @click="compareMode ? toggleCompare(product.id) : selectProduct(product)"
+             class="product-item"
+             :class="{selected: compareMode && selectedCompareProducts.includes(product.id)}">
+          <div v-if="compareMode" class="quest-checkbox" :class="{checked: selectedCompareProducts.includes(product.id)}"></div>
+          <div class="product-img">sample<br>image</div>
+          <div class="product-info">
+            <h3 class="font-bold">{{ product.name }}</h3>
+            <p class="text-sm text-gray mt-1">{{ product.brand }}</p>
+            <div class="flex-center gap-3 mt-2">
+              <div class="flex-center gap-1">
+                <span class="star filled">★</span>
+                <span class="text-sm font-bold">{{ product.rating }}</span>
+              </div>
+              <span class="text-sm text-gray">{{ product.records.toLocaleString() }}건</span>
+              <span class="text-sm font-bold text-teal">{{ product.price }}</span>
+            </div>
+          </div>
+          <span v-if="!compareMode" style="color: #d1d5db;">›</span>
+        </div>
+      </div>
+
+      <!-- Product Detail -->
+      <div v-else>
+        <button @click="selectedProduct = null" class="btn btn-secondary mb-4">← 목록으로</button>
+        
+        <div v-if="hasAllergyWarning" class="alert-danger mb-4">
+          <span style="font-size: 24px;">⚠️</span>
+          <div class="alert-content">
+            <p class="font-bold" style="color: #991b1b; margin-bottom: 8px;">{{ currentPet.name }}에게 주의 필요</p>
+            <p class="text-sm" style="color: #dc2626;">알러지 성분과 관련된 원료가 포함되어 있습니다</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="text-center" style="padding: 32px 0; background: #f9fafb; border-radius: 12px; margin-bottom: 16px;">
+            <div class="product-detail-img">sample image</div>
+          </div>
+          
+          <h2 class="font-bold" style="font-size: 24px;">{{ selectedProduct.name }}</h2>
+          <p class="text-gray mt-1">{{ selectedProduct.brand }}</p>
+          
+          <div class="flex-between mt-4">
+            <div class="flex-center gap-4">
+              <div class="flex-center gap-1">
+                <span class="star filled" style="font-size: 20px;">★</span>
+                <span class="font-bold" style="font-size: 18px;">{{ selectedProduct.rating }}</span>
+              </div>
+              <span class="text-sm text-gray">{{ selectedProduct.records.toLocaleString() }}건의 기록</span>
+            </div>
+            <div class="font-bold text-teal" style="font-size: 20px;">{{ selectedProduct.price }}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex-center gap-2 mb-3">
+            <span style="font-size: 18px;">😊</span>
+            <h3 class="font-bold">좋았던 점</h3>
+          </div>
+          <div v-for="(keyword, i) in selectedProduct.positiveKeywords" :key="i" class="keyword-bar">
+            <div style="flex: 1;">
+              <div class="flex-between text-sm mb-1">
+                <span class="font-bold">{{ keyword.text }}</span>
+                <span class="text-teal font-bold">{{ keyword.count.toLocaleString() }}</span>
+              </div>
+              <div class="keyword-progress">
+                <div class="keyword-progress-fill" :style="{width: (keyword.count / selectedProduct.positiveKeywords[0].count * 100) + '%'}"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="flex-between mb-3">
+            <h3 class="font-bold">전성분</h3>
+            <p class="text-xs text-gray">성분 클릭 시 상세 정보</p>
+          </div>
+          <div class="ingredient-tags">
+            <span v-for="(ing, i) in selectedProduct.ingredients" :key="i"
+                  @click="showIngredientDetail = ing"
+                  class="ingredient-tag"
+                  :class="getIngredientGrade(ing)">
+              {{ ing }}
+            </span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full">구매하기</button>
+      </div>
+
+      <!-- Ingredient Detail Modal -->
+      <div v-if="showIngredientDetail" class="modal-overlay" @click.self="showIngredientDetail = null">
+        <div class="modal">
+          <div class="modal-header">
+            <div>
+              <h3 class="font-bold mb-2" style="font-size: 20px;">{{ showIngredientDetail }}</h3>
+              <span class="ingredient-tag" :class="getIngredientData(showIngredientDetail).grade">
+                {{ gradeLabels[getIngredientData(showIngredientDetail).grade] }} - {{ getIngredientData(showIngredientDetail).reason }}
+              </span>
+            </div>
+            <button @click="showIngredientDetail = null" class="modal-close">×</button>
+          </div>
+          
+          <div>
+            <h4 class="font-bold text-sm mb-2">성분 설명</h4>
+            <p class="text-sm text-gray" style="line-height: 1.6;">{{ getIngredientData(showIngredientDetail).description }}</p>
+          </div>
+
+          <button @click="showIngredientDetail = null" class="btn btn-primary btn-full mt-4">확인</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Community Page -->
+    <div v-if="currentPage === 'community'" class="container">
+      <div class="flex-between mb-4">
+        <h2 class="font-bold" style="font-size: 24px;">커뮤니티</h2>
+        <button class="btn btn-primary">글쓰기</button>
+      </div>
+
+      <div class="info-card mb-4">
+        <p class="text-sm font-bold" style="color: #a855f7;">💬 보호자들과 소통해요</p>
+        <p class="text-xs mt-1" style="color: #a855f7;">
+          펫푸드 고민, 사료 추천, 건강 정보 등을 자유롭게 나눠보세요!
+        </p>
+      </div>
+
+      <div v-for="post in communityPosts" :key="post.id" class="post-item">
+        <div class="post-author">
+          <div class="author-avatar">{{ post.author[0] }}</div>
+          <div>
+            <p class="font-bold text-sm">{{ post.author }}</p>
+            <p class="text-xs text-gray">{{ post.pet }}</p>
+          </div>
+        </div>
+        <h3 class="font-bold mb-1">{{ post.title }}</h3>
+        <p class="text-sm text-gray" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          {{ post.content }}
+        </p>
+        <div class="post-meta">
+          <span>💬 {{ post.comments }}</span>
+          <span>❤️ {{ post.likes }}</span>
+          <span>🕐 {{ post.time }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Report Page -->
+    <div v-if="currentPage === 'report'" class="container">
+      <h2 class="font-bold mb-4" style="font-size: 24px;">건강 리포트</h2>
+      
+      <div class="gradient-card">
+        <p style="font-size: 14px; opacity: 0.9;">이번 달 {{ currentPet.name }}의 건강 점수</p>
+        <div style="display: flex; align-items: end; gap: 8px; margin-top: 8px;">
+          <span style="font-size: 48px; font-weight: bold;">92</span>
+          <span style="font-size: 24px; margin-bottom: 4px;">점</span>
+        </div>
+        <p style="font-size: 14px; margin-top: 8px; opacity: 0.9;">지난달 대비 +5점 상승 🎉</p>
+      </div>
+
+      <div class="card">
+        <h3 class="font-bold mb-4">주간 급여 통계</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="flex-between">
+            <span class="text-gray">총 기록일</span>
+            <span class="font-bold">{{ records.length }}일</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-gray">평균 기호성</span>
+            <div class="flex-center gap-2">
+              <div class="star-rating">
+                <span v-for="i in 5" :key="i" class="star" :class="{filled: i <= 4}" style="font-size: 16px;">★</span>
+              </div>
+              <span class="font-bold text-teal">4.5/5</span>
+            </div>
+          </div>
+          <div class="flex-between">
+            <span class="text-gray">변 정상률</span>
+            <span class="font-bold text-teal">85%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="font-bold mb-4">변 상태 분포</h3>
+        <div v-for="level in 5" :key="level" style="margin-bottom: 12px;">
+          <div class="flex-between text-sm mb-1">
+            <span class="font-bold" :style="{color: stoolColors[level]}">
+              {{ level }}단계: {{ stoolTypes[level].label }}
+            </span>
+            <span class="font-bold" :style="{color: stoolColors[level]}">
+              {{ getStoolCount(level) }}회 ({{ getStoolPercentage(level) }}%)
+            </span>
+          </div>
+          <div class="keyword-progress">
+            <div :style="{height: '100%', background: stoolProgressColors[level], transition: 'width 0.3s', width: getStoolPercentage(level) + '%'}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Page -->
+    <div v-if="currentPage === 'my'" class="container">
+      <h2 class="font-bold mb-4" style="font-size: 24px;">마이페이지</h2>
+      
+      <div style="background: #f0fdfa; border: 1px solid #5eead4; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
+        <div class="flex-between">
+          <div>
+            <p class="text-sm" style="color: #0f766e;">내 마일리지</p>
+            <p style="font-size: 32px; font-weight: bold; color: #0f766e; margin-top: 4px;">{{ mileage.toLocaleString() }}P</p>
+          </div>
+          <div style="font-size: 64px; color: #14b8a6;">🏆</div>
+        </div>
+        <button class="btn btn-primary btn-full mt-4">포인트 사용하기</button>
+      </div>
+
+      <div class="card">
+        <div class="flex-between mb-4">
+          <h3 class="font-bold">현재 선택된 반려동물</h3>
+          <button @click="showPetSelector = true" class="text-teal text-sm font-bold">변경</button>
+        </div>
+        <div style="padding: 16px; background: linear-gradient(135deg, #f0fdfa 0%, #cffafe 100%); border-radius: 12px;">
+          <div class="flex-center gap-4">
+            <div style="width: 64px; height: 64px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+              {{ currentPet.type === '강아지' ? '🐕' : '🐱' }}
+            </div>
+            <div style="flex: 1;">
+              <p class="font-bold" style="font-size: 18px;">{{ currentPet.name }}</p>
+              <p class="text-sm text-gray">{{ currentPet.breed }} • {{ currentPet.age }}살 • {{ currentPet.weight }}kg</p>
+              <div v-if="currentPet.allergies.length > 0" class="mt-2">
+                <p class="text-xs" style="color: #dc2626;">알러지: {{ currentPet.allergies.join(', ') }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="font-bold mb-4">활동 내역</h3>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="flex-between">
+            <span class="text-gray">총 기록 수</span>
+            <span class="font-bold">{{ records.length }}건</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-gray">완료한 퀘스트</span>
+            <span class="font-bold">{{ completedQuests }}개</span>
+          </div>
+          <div class="flex-between">
+            <span class="text-gray">펫푸드 문화 기여도</span>
+            <span class="font-bold" style="color: #a855f7;">{{ records.length * 10 }}점</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pet Selector Modal -->
+      <div v-if="showPetSelector" class="modal-overlay" @click.self="showPetSelector = false">
+        <div class="modal">
+          <h3 class="font-bold mb-4" style="font-size: 20px;">반려동물 선택</h3>
+          <div v-for="pet in pets" :key="pet.id"
+               @click="changePet(pet)"
+               class="pet-item"
+               :class="{active: currentPet.id === pet.id}">
+            <div class="pet-avatar">{{ pet.type === '강아지' ? '🐕' : '🐱' }}</div>
+            <div style="flex: 1;">
+              <p class="font-bold">{{ pet.name }}</p>
+              <p class="text-sm text-gray">{{ pet.breed }} • {{ pet.age }}살</p>
+            </div>
+            <span v-if="currentPet.id === pet.id" style="color: #14b8a6; font-size: 24px;">✓</span>
+          </div>
+          <button @click="showPetSelector = false" class="btn btn-secondary btn-full mt-4">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div v-if="showToast" class="toast">{{ toastMessage }}</div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <button @click="currentPage = 'home'" class="nav-item" :class="{active: currentPage === 'home'}">
+        <div class="nav-icon">🏠</div>
+        <div class="nav-label">홈</div>
+      </button>
+      <button @click="currentPage = 'quest'" class="nav-item" :class="{active: currentPage === 'quest'}">
+        <div class="nav-icon">🏆</div>
+        <div class="nav-label">퀘스트</div>
+      </button>
+      <button @click="currentPage = 'wiki'" class="nav-item" :class="{active: currentPage === 'wiki'}">
+        <div class="nav-icon">📚</div>
+        <div class="nav-label">위키</div>
+      </button>
+      <button @click="currentPage = 'community'" class="nav-item" :class="{active: currentPage === 'community'}">
+        <div class="nav-icon">💬</div>
+        <div class="nav-label">커뮤니티</div>
+      </button>
+      <button @click="currentPage = 'report'" class="nav-item" :class="{active: currentPage === 'report'}">
+        <div class="nav-icon">📊</div>
+        <div class="nav-label">리포트</div>
+      </button>
+      <button @click="currentPage = 'my'" class="nav-item" :class="{active: currentPage === 'my'}">
+        <div class="nav-icon">👤</div>
+        <div class="nav-label">MY</div>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        currentPage: 'home',
+        mileage: 2500,
+        showRecordForm: false,
+        showQuestComplete: false,
+        showPetSelector: false,
+        showIngredientDetail: null,
+        showToast: false,
+        toastMessage: '',
+        compareMode: false,
+        selectedCompareProducts: [],
+        searchTerm: '',
+        selectedProduct: null,
+        
+        currentPet: {
+          id: 1,
+          name: '해피',
+          type: '강아지',
+          breed: '말티즈',
+          age: 3,
+          weight: 4.2,
+          allergies: ['곡물', '닭고기'],
+          healthIssues: ['소화불량']
+        },
+        
+        pets: [
+          { id: 1, name: '해피', type: '강아지', breed: '말티즈', age: 3, weight: 4.2, allergies: ['곡물', '닭고기'], healthIssues: ['소화불량'] },
+          { id: 2, name: '초코', type: '고양이', breed: '코숏', age: 2, weight: 3.5, allergies: ['생선'], healthIssues: [] }
+        ],
+        
+        quests: [
+          { id: 1, title: '오늘의 사료 기록하기', reward: 100, completed: false, week: 1 },
+          { id: 2, title: '변 상태 체크하기', reward: 50, completed: false, week: 1 },
+          { id: 3, title: '제품 위키 등록하기', reward: 200, completed: false, week: 1 }
+        ],
+        
+        records: [
+          { id: 1, product: '로얄캐닌 소형견', date: '2025.10.01', stool: 2, preference: 5 },
+          { id: 2, product: '오리젠 퍼피', date: '2025.09.30', stool: 3, preference: 4 },
+          { id: 3, product: '아카나 스몰브리드', date: '2025.09.29', stool: 2, preference: 5 }
+        ],
+        
+        formData: {
+          product: '',
+          stool: 2,
+          preference: 5
+        },
+        
+        stoolTypes: {
+          1: { label: '매우 단단함', desc: '건조한 알갱이 형태' },
+          2: { label: '정상(이상적)', desc: '단단하고 형태 유지' },
+          3: { label: '약간 무름', desc: '형태는 있으나 부드러움' },
+          4: { label: '무름', desc: '형태가 흐트러짐' },
+          5: { label: '설사', desc: '액체 상태' }
+        },
+        
+        stoolColors: {
+          1: '#dc2626',
+          2: '#16a34a',
+          3: '#eab308',
+          4: '#f97316',
+          5: '#dc2626'
+        },
+        
+        stoolProgressColors: {
+          1: '#ef4444',
+          2: '#22c55e',
+          3: '#eab308',
+          4: '#f97316',
+          5: '#ef4444'
+        },
+        
+        products: [
+          {
+            id: 1,
+            name: '로얄캐닌 소형견 사료',
+            brand: '로얄캐닌',
+            rating: 4.5,
+            records: 1368,
+            image: 'https://via.placeholder.com/200x200/00C4B4/ffffff?text=Royal+Canin',
+            price: '42,000원',
+            ingredients: ['닭고기분', '쌀', '옥수수', '동물성지방', '식물성단백질', '비트펄프'],
+            positiveKeywords: [
+              { text: '기호성 좋아요', count: 892 },
+              { text: '소화 잘돼요', count: 654 },
+              { text: '변 상태 개선', count: 487 }
+            ]
+          },
+          {
+            id: 2,
+            name: '오리젠 퍼피 독',
+            brand: '오리젠',
+            rating: 4.7,
+            records: 1026,
+            image: 'https://via.placeholder.com/200x200/FF6B9D/ffffff?text=Orijen',
+            price: '89,000원',
+            ingredients: ['생닭고기', '생칠면조고기', '생연어', '탈수닭고기', '닭간', '칠면조간', '렌틸콩', '완두콩'],
+            positiveKeywords: [
+              { text: '기호성 최고', count: 1545 },
+              { text: '변이 좋아졌어요', count: 876 },
+              { text: '털 윤기', count: 654 }
+            ]
+          }
+        ],
+        
+        ingredientGrades: {
+          '생닭고기': { grade: 'safe', reason: '신선한 육류 단백질', description: '소화가 잘되고 영양가가 높은 고품질 동물성 단백질입니다.' },
+          '생칠면조고기': { grade: 'safe', reason: '저지방 고단백', description: '알레르기 반응이 적고 지방 함량이 낮은 우수한 단백질원입니다.' },
+          '닭고기분': { grade: 'caution', reason: '가공 육류', description: '탈수 처리된 닭고기로, 신선육보다 영양가는 낮지만 보관이 용이합니다.' },
+          '쌀': { grade: 'caution', reason: '탄수화물원', description: '소화가 잘되는 탄수화물이지만, 과다 섭취 시 혈당 상승 가능성이 있습니다.' },
+          '옥수수': { grade: 'warning', reason: '알러지 유발', description: '충진제로 사용되며 알러지 반응과 소화 불량을 유발할 수 있습니다.' },
+          '동물성지방': { grade: 'warning', reason: '출처 불명확', description: '어떤 동물의 지방인지 명시되지 않아 품질 확인이 어렵습니다.' }
+        },
+        
+        gradeLabels: {
+          safe: '안전',
+          caution: '주의',
+          warning: '유의'
+        },
+        
+        communityPosts: [
+          {
+            id: 1,
+            author: '해피맘',
+            pet: '말티즈 3살',
+            title: '사료 바꾸고 나서 변이 무른데 정상인가요?',
+            content: '로얄캐닌에서 오리젠으로 바꾼지 3일째인데 변이 4단계로 무른 편이에요. 적응 기간이 필요한 건지 다시 바꿔야 할지 고민됩니다...',
+            comments: 12,
+            likes: 8,
+            time: '2시간 전'
+          },
+          {
+            id: 2,
+            author: '초코집사',
+            pet: '코숏 2살',
+            title: '고양이 사료 추천 부탁드려요!',
+            content: '알러지가 있는 고양이인데 저자극 사료 찾고 있어요. 연어 베이스로 괜찮은 제품 있을까요?',
+            comments: 24,
+            likes: 15,
+            time: '5시간 전'
+          }
+        ]
+      },
+      
+      computed: {
+        normalStoolRate() {
+          const recent = this.records.slice(0, 3);
+          if (recent.length === 0) return 0;
+          return Math.round(recent.filter(r => r.stool === 2).length / recent.length * 100);
+        },
+        
+        completedQuests() {
+          return this.quests.filter(q => q.completed).length;
+        },
+        
+        completionRate() {
+          return Math.round(this.completedQuests / this.quests.length * 100);
+        },
+        
+        filteredProducts() {
+          return this.products.filter(p =>
+            p.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+            p.brand.toLowerCase().includes(this.searchTerm.toLowerCase())
+          );
+        },
+        
+        hasAllergyWarning() {
+          if (!this.selectedProduct) return false;
+          return this.selectedProduct.ingredients.some(ing =>
+            this.currentPet.allergies.some(allergy =>
+              ing.toLowerCase().includes(allergy.toLowerCase())
+            )
+          );
+        }
+      },
+      
+      methods: {
+        completeQuest(questId) {
+          const quest = this.quests.find(q => q.id === questId);
+          if (quest && !quest.completed) {
+            quest.completed = true;
+            this.mileage += quest.reward;
+            this.showQuestComplete = true;
+            setTimeout(() => {
+              this.showQuestComplete = false;
+            }, 3000);
+          }
+        },
+        
+        submitRecord() {
+          if (this.formData.product) {
+            const newRecord = {
+              id: this.records.length + 1,
+              product: this.formData.product,
+              date: new Date().toLocaleDateString('ko-KR').replace(/\. /g, '.').slice(0, -1),
+              stool: this.formData.stool,
+              preference: this.formData.preference
+            };
+            this.records.unshift(newRecord);
+            this.completeQuest(1);
+            this.completeQuest(2);
+            this.showRecordForm = false;
+            this.formData = { product: '', stool: 2, preference: 5 };
+          }
+        },
+        
+        changePet(pet) {
+          this.currentPet = pet;
+          this.showPetSelector = false;
+          this.showToast = true;
+          this.toastMessage = `${pet.name}(으)로 변경되었습니다`;
+          setTimeout(() => {
+            this.showToast = false;
+          }, 2000);
+        },
+        
+        selectProduct(product) {
+          this.selectedProduct = product;
+        },
+        
+        toggleCompare(productId) {
+          const index = this.selectedCompareProducts.indexOf(productId);
+          if (index > -1) {
+            this.selectedCompareProducts.splice(index, 1);
+          } else if (this.selectedCompareProducts.length < 3) {
+            this.selectedCompareProducts.push(productId);
+          }
+        },
+        
+        getIngredientGrade(ingredient) {
+          const data = this.ingredientGrades[ingredient];
+          return data ? data.grade : 'caution';
+        },
+        
+        getIngredientData(ingredient) {
+          return this.ingredientGrades[ingredient] || {
+            grade: 'caution',
+            reason: '정보 없음',
+            description: '해당 성분에 대한 상세 정보가 아직 등록되지 않았습니다.'
+          };
+        },
+        
+        getStoolCount(level) {
+          return this.records.filter(r => r.stool === level).length;
+        },
+        
+        getStoolPercentage(level) {
+          if (this.records.length === 0) return 0;
+          return Math.round(this.getStoolCount(level) / this.records.length * 100);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
