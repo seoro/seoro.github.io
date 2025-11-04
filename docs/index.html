@@ -4,7 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>크로니펫 - 반려동물 건강 데이터 플랫폼</title>
+  <link rel="icon" type="image/png" href="chronipet-icon-teal.png">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <!--
+    브랜딩 이미지 파일 경로 및 사용 위치:
+    
+    1. chronipet-logo-horizontal-teal-pencil.png (가로형 로고 - 청록색, 연필 포함)
+       → 헤더 로고
+    
+    2. chronipet-logo-circle-teal-bg.png (원형 로고 - 청록 배경)
+       → 스플래시 화면 (앱 시작 시 2초간 표시)
+    
+    3. chronipet-icon-white.png (아이콘 - 흰색)
+       → 퀘스트 완료 모달
+       → 홈 화면 대시보드 (filter로 흰색 변환)
+       → 리포트 화면 대시보드 (filter로 흰색 변환)
+    
+    4. chronipet-icon-teal.png (아이콘 - 청록색)
+       → 정보 카드 (홈, 커뮤니티, 리포트)
+       → 퀘스트 상세 모달 팁 섹션
+       → 스트릭 배지
+       → 마이페이지 마일리지
+       → 파비콘
+    
+    실제 프로젝트 사용 방법:
+    1. 이 HTML 파일과 같은 폴더에 4개의 이미지 파일을 배치하세요
+    2. 파일명이 위 리스트와 정확히 일치하는지 확인하세요
+    3. 이미지가 표시되지 않으면 브라우저 개발자 도구(F12)에서 Network 탭을 확인하세요
+    
+    대체 방법:
+    - 이미지를 다른 폴더에 저장한 경우: 경로를 "images/파일명.png"로 수정
+    - CDN 사용 시: 전체 URL로 변경
+  -->
   <style>
     * {
       margin: 0;
@@ -31,20 +62,34 @@
     .header {
       background: white;
       border-bottom: 1px solid #e5e7eb;
-      padding: 16px;
+      padding: 12px 16px;
       position: sticky;
       top: 0;
       z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .header-logo {
+      height: 32px;
+      width: auto;
+    }
+    
+    .header-title {
+      display: flex;
+      flex-direction: column;
     }
     
     .header h1 {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
       color: #14b8a6;
+      line-height: 1.2;
     }
     
     .header p {
-      font-size: 12px;
+      font-size: 10px;
       color: #6b7280;
       margin-top: 2px;
     }
@@ -179,15 +224,23 @@
       border-radius: 12px;
       padding: 16px;
       margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .quest-item:hover {
+      border-color: #14b8a6;
+      box-shadow: 0 2px 8px rgba(20, 184, 166, 0.1);
     }
     
     .quest-item.completed {
       background: #f0fdf4;
       border-color: #86efac;
+    }
+    
+    .quest-item.in-progress {
+      background: #fffbeb;
+      border-color: #fcd34d;
     }
     
     .quest-left {
@@ -217,6 +270,75 @@
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: 14px;
+    }
+    
+    .quest-progress {
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    
+    .quest-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #14b8a6 0%, #06b6d4 100%);
+      transition: width 0.3s;
+    }
+    
+    .quest-detail-modal {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .quest-reward-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 1px solid #fbbf24;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #92400e;
+    }
+    
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      border: 1px solid #f87171;
+      border-radius: 16px;
+      font-weight: 600;
+      color: #991b1b;
+    }
+    
+    .tab-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .tab-btn {
+      padding: 8px 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: #6b7280;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    
+    .tab-btn.active {
+      color: #14b8a6;
+      border-bottom-color: #14b8a6;
     }
     
     /* Progress Bar */
@@ -318,15 +440,19 @@
     }
     
     .ingredient-tag {
-      padding: 4px 8px;
+      padding: 6px 10px;
       border-radius: 6px;
       font-size: 12px;
       cursor: pointer;
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     
     .ingredient-tag:hover {
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
     }
     
     .ingredient-tag.safe {
@@ -345,6 +471,55 @@
       background: #fef2f2;
       color: #991b1b;
       border: 1px solid #fecaca;
+    }
+    
+    .ingredient-percentage {
+      font-weight: bold;
+      margin-left: 2px;
+    }
+    
+    .ingredient-filter {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .filter-chip {
+      padding: 6px 12px;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-chip.active {
+      background: #14b8a6;
+      color: white;
+      border-color: #14b8a6;
+    }
+    
+    .nutrition-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    
+    .nutrition-table td {
+      padding: 8px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 13px;
+    }
+    
+    .nutrition-table td:first-child {
+      color: #6b7280;
+      width: 40%;
+    }
+    
+    .nutrition-table td:last-child {
+      font-weight: 600;
+      text-align: right;
     }
     
     /* Modal */
@@ -575,6 +750,13 @@
       justify-content: center;
       color: white;
       font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .author-avatar.small {
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
     }
     
     .post-meta {
@@ -583,6 +765,106 @@
       margin-top: 12px;
       font-size: 12px;
       color: #6b7280;
+    }
+    
+    .post-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    .post-meta-item:hover {
+      color: #14b8a6;
+    }
+    
+    .post-meta-item.liked {
+      color: #ef4444;
+    }
+    
+    .category-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    
+    .category-tab {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .category-tab.active {
+      background: #14b8a6;
+      color: white;
+      border-color: #14b8a6;
+    }
+    
+    .post-image {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 2px solid #bae6fd;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0369a1;
+      font-weight: 600;
+      margin: 12px 0;
+    }
+    
+    .comment-item {
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .comment-item.reply {
+      margin-left: 40px;
+      background: #f0fdfa;
+      border-left: 2px solid #14b8a6;
+    }
+    
+    .comment-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+    
+    .comment-action {
+      color: #6b7280;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    .comment-action:hover {
+      color: #14b8a6;
+    }
+    
+    .textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      resize: none;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    
+    .textarea:focus {
+      outline: none;
+      border-color: #14b8a6;
     }
     
     /* Keyword Bar */
@@ -641,35 +923,122 @@
 </head>
 <body>
   <div id="app">
+    <!-- Splash Screen -->
+    <div v-if="showSplash" class="splash-screen">
+      <img src="chronipet-logo-circle-teal-bg.png" alt="크로니펫" class="splash-logo">
+      <p class="splash-text">크로니펫</p>
+      <p style="color: white; font-size: 14px; margin-top: 8px; opacity: 0.9;">Chronicle of Love and Care for Pet</p>
+    </div>
+
+    <!-- Onboarding -->
+    <div v-if="showOnboarding" class="onboarding-overlay">
+      <div class="onboarding-modal">
+        <div class="onboarding-steps">
+          <div v-for="i in 4" :key="i" class="step-dot" :class="{active: i === onboardingStep}"></div>
+        </div>
+
+        <!-- Step 1: 환영 -->
+        <div v-if="onboardingStep === 1">
+          <img src="chronipet-icon-teal.png" alt="크로니펫" style="width: 100px; height: 100px; margin: 0 auto 20px;">
+          <h2 class="font-bold mb-3" style="font-size: 24px;">크로니펫에 오신 것을 환영합니다!</h2>
+          <p class="text-gray mb-6" style="line-height: 1.6;">
+            반려동물의 건강 데이터를 기록하고<br>
+            최적의 펫푸드를 찾아드려요
+          </p>
+        </div>
+
+        <!-- Step 2: 핵심 가치 -->
+        <div v-if="onboardingStep === 2">
+          <div style="font-size: 64px; margin-bottom: 20px;">📊</div>
+          <h2 class="font-bold mb-3" style="font-size: 24px;">데이터로 증명하는 건강</h2>
+          <p class="text-gray mb-6" style="line-height: 1.6;">
+            매일 급여를 기록하면<br>
+            AI가 {{ currentPet.name }}에게 맞는<br>
+            사료를 추천해드려요
+          </p>
+        </div>
+
+        <!-- Step 3: 게임화 -->
+        <div v-if="onboardingStep === 3">
+          <div style="font-size: 64px; margin-bottom: 20px;">🎮</div>
+          <h2 class="font-bold mb-3" style="font-size: 24px;">퀘스트로 마일리지 획득</h2>
+          <p class="text-gray mb-6" style="line-height: 1.6;">
+            기록할수록 포인트가 쌓여요<br>
+            다양한 리워드로 교환하세요!
+          </p>
+        </div>
+
+        <!-- Step 4: 시작하기 -->
+        <div v-if="onboardingStep === 4">
+          <div style="font-size: 64px; margin-bottom: 20px;">🚀</div>
+          <h2 class="font-bold mb-3" style="font-size: 24px;">지금 바로 시작하세요!</h2>
+          <p class="text-gray mb-6" style="line-height: 1.6;">
+            첫 급여를 기록하고<br>
+            <strong style="color: #14b8a6;">100P 보너스</strong>를 받으세요
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button v-if="onboardingStep > 1" @click="onboardingStep--" class="btn btn-secondary" style="flex: 1;">
+            이전
+          </button>
+          <button v-if="onboardingStep < 4" @click="onboardingStep++" class="btn btn-primary" style="flex: 1;">
+            다음
+          </button>
+          <button v-if="onboardingStep === 4" @click="completeOnboarding" class="btn btn-primary" style="flex: 1;">
+            시작하기
+          </button>
+        </div>
+        <button v-if="onboardingStep < 4" @click="skipOnboarding" class="text-sm text-gray mt-3" style="background: none; border: none; cursor: pointer;">
+          건너뛰기
+        </button>
+      </div>
+    </div>
+
     <!-- Header -->
     <div class="header">
-      <h1>크로니펫</h1>
-      <p>반려동물 건강 데이터 플랫폼</p>
+      <img src="chronipet-logo-horizontal-teal-pencil.png" alt="크로니펫" class="header-logo">
+      <div class="header-title">
+        <h1>크로니펫</h1>
+        <p>반려동물 건강 데이터 플랫폼</p>
+      </div>
     </div>
 
     <!-- Main Content -->
     <div v-if="currentPage === 'home'" class="container">
       <div class="gradient-card">
         <div class="flex-between">
-          <div>
+          <div style="flex: 1;">
             <p style="opacity: 0.9; font-size: 14px;">안녕하세요!</p>
             <h2 style="font-size: 24px; font-weight: bold; margin-top: 4px;">{{ currentPet.name }}의 건강 기록</h2>
             <p style="font-size: 12px; opacity: 0.8; margin-top: 4px;">
               {{ currentPet.breed }} • {{ currentPet.age }}살 • {{ currentPet.weight }}kg
             </p>
+            <div style="margin-top: 16px; display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 14px;">내 마일리지</span>
+              <span style="font-size: 28px; font-weight: bold;">{{ mileage.toLocaleString() }}P</span>
+            </div>
           </div>
-          <div style="font-size: 48px;">🏆</div>
-        </div>
-        <div style="margin-top: 16px; display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 14px;">내 마일리지</span>
-          <span style="font-size: 28px; font-weight: bold;">{{ mileage.toLocaleString() }}P</span>
+          <img src="chronipet-icon-white.png" alt="크로니펫" style="width: 80px; height: 80px; filter: brightness(0) invert(1);">
         </div>
       </div>
 
+      <!-- 통계 기간 선택 -->
       <div class="card">
         <div class="flex-between mb-3">
-          <h3 class="font-bold">오늘의 {{ currentPet.name }}</h3>
-          <span class="text-xs text-gray">최근 3일 기준</span>
+          <h3 class="font-bold">건강 요약</h3>
+          <div style="display: flex; gap: 8px;">
+            <button @click="reportPeriod = 'week'" 
+                    class="text-xs px-2 py-1 rounded" 
+                    :style="{background: reportPeriod === 'week' ? '#14b8a6' : '#f3f4f6', color: reportPeriod === 'week' ? 'white' : '#6b7280'}">
+              주간
+            </button>
+            <button @click="reportPeriod = 'month'" 
+                    class="text-xs px-2 py-1 rounded" 
+                    :style="{background: reportPeriod === 'month' ? '#14b8a6' : '#f3f4f6', color: reportPeriod === 'month' ? 'white' : '#6b7280'}">
+              월간
+            </button>
+          </div>
         </div>
         <div class="grid-3">
           <div class="stat-box">
@@ -685,6 +1054,39 @@
           <div class="stat-box teal">
             <div class="stat-value">{{ records.length }}</div>
             <div class="stat-label">총 기록일</div>
+          </div>
+        </div>
+        
+        <!-- 추가 통계 -->
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+          <div style="display: flex; justify-content: space-around; text-align: center;">
+            <div>
+              <p class="text-xs text-gray">연속 기록</p>
+              <p class="font-bold text-teal" style="font-size: 18px;">{{ streak }}일</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray">이번 주 퀘스트</p>
+              <p class="font-bold text-teal" style="font-size: 18px;">{{ weeklyQuestCompletion }}/{{ weeklyQuests.length }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray">건강 점수</p>
+              <p class="font-bold text-teal" style="font-size: 18px;">92점</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 최근 알림 -->
+      <div class="card">
+        <h3 class="font-bold mb-3">최근 알림</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="padding: 8px; background: #fef3c7; border-left: 3px solid #fbbf24; border-radius: 4px;">
+            <p class="text-sm font-bold" style="color: #92400e;">🎉 일일 퀘스트 완료!</p>
+            <p class="text-xs" style="color: #92400e; margin-top: 2px;">100P를 획득했어요</p>
+          </div>
+          <div style="padding: 8px; background: #f0fdfa; border-left: 3px solid #14b8a6; border-radius: 4px;">
+            <p class="text-sm font-bold" style="color: #0f766e;">💬 새 댓글 알림</p>
+            <p class="text-xs" style="color: #0f766e; margin-top: 2px;">내 게시글에 댓글이 달렸어요</p>
           </div>
         </div>
       </div>
@@ -705,7 +1107,12 @@
       </div>
 
       <div class="info-card">
-        <p class="text-sm font-bold" style="color: #a855f7;">💕 기록할수록 {{ currentPet.name }}와 더 오래, 행복하게!</p>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <img src="chronipet-icon-teal.png" alt="크로니펫" class="brand-icon">
+          <div style="flex: 1;">
+            <p class="text-sm font-bold" style="color: #a855f7;">💕 기록할수록 {{ currentPet.name }}와 더 오래, 행복하게!</p>
+          </div>
+        </div>
         <div class="progress-bar">
           <div class="progress-fill" :style="{width: (records.length / 50 * 100) + '%'}"></div>
         </div>
@@ -715,52 +1122,175 @@
       </div>
 
       <div>
-        <h3 class="font-bold mb-3" style="font-size: 18px;">이번 주 퀘스트</h3>
-        <div v-for="quest in quests" :key="quest.id" class="quest-item" :class="{completed: quest.completed}">
-          <div class="quest-left">
-            <div class="quest-checkbox" :class="{checked: quest.completed}"></div>
-            <div>
-              <p class="font-bold" :style="{textDecoration: quest.completed ? 'line-through' : 'none', color: quest.completed ? '#9ca3af' : '#1f2937'}">
-                {{ quest.title }}
-              </p>
-              <p class="text-sm text-teal">+{{ quest.reward }}P</p>
-            </div>
-          </div>
-          <span style="color: #d1d5db;">›</span>
+        <div class="flex-between mb-3">
+          <h3 class="font-bold text-lg">오늘의 퀘스트</h3>
+          <button 
+            @click="currentPage = 'quest'"
+            class="text-sm text-teal-600 font-medium"
+          >
+            전체 보기 →
+          </button>
         </div>
+        
+        <div v-if="dailyQuests.length === 0" class="empty-state">
+          <img src="chronipet-icon-teal.png" alt="크로니펫">
+          <h3>오늘의 퀘스트가 준비 중이에요</h3>
+          <p>곧 새로운 미션이 등장합니다!</p>
+        </div>
+        
+        <div v-else>
+          <div v-for="quest in dailyQuests.slice(0, 3)" :key="quest.id" 
+               @click="currentPage = 'quest'"
+               class="quest-item" 
+               :class="{completed: quest.completed}">
+            <div class="quest-left" style="flex: 1;">
+              <div class="quest-checkbox" :class="{checked: quest.completed}"></div>
+              <div style="flex: 1;">
+                <p class="font-bold" :style="{textDecoration: quest.completed ? 'line-through' : 'none', color: quest.completed ? '#9ca3af' : '#1f2937'}">
+                  {{ quest.title }}
+                </p>
+                <p class="text-sm text-teal">+{{ quest.reward }}P</p>
+              </div>
+            </div>
+            <span style="color: #d1d5db;">›</span>
+          </div>
+        </div>
+        
+        <button v-if="dailyQuests.length > 0" @click="currentPage = 'quest'" class="btn btn-secondary btn-full mt-2">
+          모든 퀘스트 보기
+        </button>
       </div>
     </div>
 
     <!-- Quest Page -->
     <div v-if="currentPage === 'quest'" class="container">
-      <h2 class="font-bold mb-4" style="font-size: 24px;">주간 퀘스트</h2>
+      <h2 class="font-bold mb-4" style="font-size: 24px;">퀘스트</h2>
       
-      <div style="background: #f0fdfa; border: 1px solid #5eead4; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
-        <p class="text-sm" style="color: #0f766e;">이번 주 완료율</p>
-        <div class="progress-bar" style="background: white; margin-top: 8px;">
-          <div style="height: 100%; background: #14b8a6; transition: width 0.3s;" :style="{width: completionRate + '%'}"></div>
-        </div>
-        <p class="text-sm text-teal text-right mt-2">{{ completedQuests }}/{{ quests.length }} 완료</p>
-      </div>
-
-      <div v-for="quest in quests" :key="quest.id" class="card">
+      <!-- 스트릭 배지 -->
+      <div class="card mb-4" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #fbbf24;">
         <div class="flex-between">
-          <div style="flex: 1;">
-            <h3 class="font-bold" style="font-size: 18px; margin-bottom: 4px;">{{ quest.title }}</h3>
-            <p class="text-sm text-gray">Week {{ quest.week }} 미션</p>
-            <div class="flex-center gap-2 mt-3">
-              <span style="font-size: 16px;">🏆</span>
-              <span class="text-teal font-bold">+{{ quest.reward }}P</span>
+          <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+            <img src="chronipet-icon-teal.png" alt="크로니펫" style="width: 56px; height: 56px;">
+            <div>
+              <p class="font-bold" style="color: #92400e; font-size: 18px;">🔥 {{ streak }}일 연속 기록 중!</p>
+              <p class="text-sm" style="color: #92400e; margin-top: 4px;">
+                꾸준함이 {{ currentPet.name }}의 건강을 만듭니다
+              </p>
             </div>
           </div>
+          <div class="streak-badge">
+            {{ streak }}일
+          </div>
+        </div>
+      </div>
+      
+      <!-- 퀘스트 탭 -->
+      <div class="tab-group">
+        <button @click="questTab = 'daily'" class="tab-btn" :class="{active: questTab === 'daily'}">
+          일일 ({{ dailyQuestCompletion }}/{{ dailyQuests.length }})
+        </button>
+        <button @click="questTab = 'weekly'" class="tab-btn" :class="{active: questTab === 'weekly'}">
+          주간 ({{ weeklyQuestCompletion }}/{{ weeklyQuests.length }})
+        </button>
+        <button @click="questTab = 'monthly'" class="tab-btn" :class="{active: questTab === 'monthly'}">
+          월간 ({{ monthlyQuestCompletion }}/{{ monthlyQuests.length }})
+        </button>
+      </div>
+      
+      <!-- 완료율 -->
+      <div style="background: #f0fdfa; border: 1px solid #5eead4; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+        <p class="text-sm" style="color: #0f766e;">{{ questTab === 'daily' ? '오늘' : questTab === 'weekly' ? '이번 주' : '이번 달' }} 완료율</p>
+        <div class="progress-bar" style="background: white; margin-top: 8px;">
+          <div style="height: 100%; background: #14b8a6; transition: width 0.3s;" :style="{width: currentQuestCompletionRate + '%'}"></div>
+        </div>
+        <p class="text-sm text-teal text-right mt-2">
+          {{ currentCompletedQuests }}/{{ currentTotalQuests }} 완료
+        </p>
+      </div>
+
+      <!-- 퀘스트 목록 -->
+      <div v-for="quest in currentQuests" :key="quest.id" 
+           @click="showQuestDetail = quest"
+           class="quest-item"
+           :class="{completed: quest.completed, 'in-progress': quest.progress > 0 && !quest.completed}">
+        <div style="display: flex; justify-content: space-between; align-items: start; width: 100%;">
+          <div class="quest-left" style="flex: 1;">
+            <div class="quest-checkbox" :class="{checked: quest.completed}"></div>
+            <div style="flex: 1;">
+              <p class="font-bold" :style="{textDecoration: quest.completed ? 'line-through' : 'none', color: quest.completed ? '#9ca3af' : '#1f2937'}">
+                {{ quest.title }}
+              </p>
+              <p class="text-xs text-gray mt-1">{{ quest.desc }}</p>
+              <div class="flex-center gap-2 mt-2">
+                <div class="quest-reward-badge">
+                  🏆 +{{ quest.reward }}P
+                </div>
+                <span class="text-xs" style="color: #14b8a6;">{{ quest.progress }}/{{ quest.max }}</span>
+              </div>
+              <div v-if="!quest.completed" class="quest-progress">
+                <div class="quest-progress-fill" :style="{width: (quest.progress / quest.max * 100) + '%'}"></div>
+              </div>
+            </div>
+          </div>
+          <span style="color: #d1d5db; font-size: 20px;">›</span>
+        </div>
+      </div>
+
+      <!-- 퀘스트 상세 모달 -->
+      <div v-if="showQuestDetail" class="modal-overlay" @click.self="showQuestDetail = null">
+        <div class="modal quest-detail-modal">
+          <div class="modal-header">
+            <h3 class="font-bold" style="font-size: 20px;">{{ showQuestDetail.title }}</h3>
+            <button @click="showQuestDetail = null" class="modal-close">×</button>
+          </div>
+          
+          <div class="card" style="background: #f9fafb; margin-bottom: 16px;">
+            <p class="text-sm text-gray mb-2">퀘스트 설명</p>
+            <p class="font-bold">{{ showQuestDetail.desc }}</p>
+          </div>
+
+          <div class="card" style="margin-bottom: 16px;">
+            <p class="text-sm text-gray mb-3">진행 상황</p>
+            <div class="flex-between mb-2">
+              <span class="font-bold" style="color: #14b8a6; font-size: 24px;">
+                {{ showQuestDetail.progress }}/{{ showQuestDetail.max }}
+              </span>
+              <span class="text-sm" style="color: #6b7280;">
+                {{ Math.round(showQuestDetail.progress / showQuestDetail.max * 100) }}% 완료
+              </span>
+            </div>
+            <div class="quest-progress" style="height: 12px;">
+              <div class="quest-progress-fill" :style="{width: (showQuestDetail.progress / showQuestDetail.max * 100) + '%'}"></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom: 16px;">
+            <p class="text-sm text-gray mb-2">보상</p>
+            <div class="quest-reward-badge" style="font-size: 16px; padding: 8px 16px;">
+              🏆 마일리지 {{ showQuestDetail.reward }}P
+            </div>
+          </div>
+
+          <div class="card" style="background: linear-gradient(135deg, #fdf4ff 0%, #fce7f3 100%); border: 1px solid #f0abfc;">
+            <p class="text-sm font-bold" style="color: #a855f7;">💡 팁</p>
+            <p class="text-xs mt-2" style="color: #a855f7; line-height: 1.5;">
+              {{ getQuestTip(showQuestDetail.id) }}
+            </p>
+          </div>
+
           <button 
-            @click="quest.id === 1 ? showRecordForm = true : completeQuest(quest.id)"
-            :disabled="quest.completed"
-            class="btn"
-            :class="quest.completed ? 'btn-secondary' : 'btn-primary'"
-            :style="{opacity: quest.completed ? 0.5 : 1, cursor: quest.completed ? 'not-allowed' : 'pointer'}"
+            v-if="showQuestDetail.id === 1 && !showQuestDetail.completed"
+            @click="showRecordForm = true; showQuestDetail = null" 
+            class="btn btn-primary btn-full mt-4"
           >
-            {{ quest.completed ? '완료' : '시작' }}
+            지금 기록하기
+          </button>
+          <button 
+            v-else-if="showQuestDetail.completed"
+            class="btn btn-secondary btn-full mt-4"
+            disabled
+          >
+            ✓ 완료됨
           </button>
         </div>
       </div>
@@ -811,8 +1341,8 @@
       <!-- Quest Complete Modal -->
       <div v-if="showQuestComplete" class="modal-overlay">
         <div class="modal text-center">
-          <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 40px;">
-            💕
+          <div class="quest-complete-logo">
+            <img src="chronipet-icon-white.png" alt="크로니펫">
           </div>
           <h3 class="font-bold mb-2" style="font-size: 24px;">퀘스트 완료!</h3>
           <p class="text-gray mb-4">
@@ -915,16 +1445,88 @@
         <div class="card">
           <div class="flex-between mb-3">
             <h3 class="font-bold">전성분</h3>
-            <p class="text-xs text-gray">성분 클릭 시 상세 정보</p>
+            <p class="text-xs text-gray">함량 순 표기</p>
           </div>
+          
+          <!-- 성분 필터 -->
+          <div class="ingredient-filter">
+            <button @click="ingredientFilter = 'all'" class="filter-chip" :class="{active: ingredientFilter === 'all'}">
+              전체
+            </button>
+            <button @click="ingredientFilter = 'safe'" class="filter-chip" :class="{active: ingredientFilter === 'safe'}">
+              ✓ 안전
+            </button>
+            <button @click="ingredientFilter = 'caution'" class="filter-chip" :class="{active: ingredientFilter === 'caution'}">
+              ⚠ 주의
+            </button>
+            <button @click="ingredientFilter = 'warning'" class="filter-chip" :class="{active: ingredientFilter === 'warning'}">
+              ! 유의
+            </button>
+          </div>
+
           <div class="ingredient-tags">
-            <span v-for="(ing, i) in selectedProduct.ingredients" :key="i"
-                  @click="showIngredientDetail = ing"
+            <span v-for="(ing, i) in filteredIngredients(selectedProduct.ingredients)" :key="i"
+                  @click="showIngredientDetail = ing.name"
                   class="ingredient-tag"
-                  :class="getIngredientGrade(ing)">
-              {{ ing }}
+                  :class="getIngredientGrade(ing.name)">
+              {{ i + 1 }}. {{ ing.name }}
+              <span class="ingredient-percentage">{{ ing.percentage }}%</span>
             </span>
           </div>
+          
+          <div class="mt-3 text-xs text-gray">
+            <p>💡 성분을 클릭하면 상세 정보를 볼 수 있습니다</p>
+            <p class="mt-1">📊 함량이 높을수록 앞쪽에 표기됩니다</p>
+          </div>
+        </div>
+
+        <!-- 영양 성분 -->
+        <div class="card">
+          <h3 class="font-bold mb-3">보증 영양 성분</h3>
+          <table class="nutrition-table">
+            <tr>
+              <td>조단백질</td>
+              <td>{{ selectedProduct.nutrition.protein }}</td>
+            </tr>
+            <tr>
+              <td>조지방</td>
+              <td>{{ selectedProduct.nutrition.fat }}</td>
+            </tr>
+            <tr>
+              <td>조섬유</td>
+              <td>{{ selectedProduct.nutrition.fiber }}</td>
+            </tr>
+            <tr>
+              <td>수분</td>
+              <td>{{ selectedProduct.nutrition.moisture }}</td>
+            </tr>
+            <tr>
+              <td>조회분</td>
+              <td>{{ selectedProduct.nutrition.ash }}</td>
+            </tr>
+            <tr>
+              <td>칼슘</td>
+              <td>{{ selectedProduct.nutrition.calcium }}</td>
+            </tr>
+            <tr>
+              <td>인</td>
+              <td>{{ selectedProduct.nutrition.phosphorus }}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- 인증 정보 -->
+        <div class="card">
+          <h3 class="font-bold mb-3">인증 및 기준</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <span v-for="(cert, i) in selectedProduct.certifications" :key="i"
+                  style="padding: 6px 12px; background: #f0fdfa; color: #0f766e; border: 1px solid #5eead4; border-radius: 12px; font-size: 12px; font-weight: 600;">
+              ✓ {{ cert }}
+            </span>
+          </div>
+          <p class="text-xs text-gray mt-3">
+            이 제품은 반려동물 영양 기준을 충족합니다
+          </p>
         </div>
 
         <button class="btn btn-primary btn-full">구매하기</button>
@@ -943,46 +1545,247 @@
             <button @click="showIngredientDetail = null" class="modal-close">×</button>
           </div>
           
-          <div>
+          <div style="margin-bottom: 16px;">
             <h4 class="font-bold text-sm mb-2">성분 설명</h4>
             <p class="text-sm text-gray" style="line-height: 1.6;">{{ getIngredientData(showIngredientDetail).description }}</p>
           </div>
 
-          <button @click="showIngredientDetail = null" class="btn btn-primary btn-full mt-4">확인</button>
+          <!-- 장점 -->
+          <div v-if="getIngredientData(showIngredientDetail).benefits" style="margin-bottom: 16px;">
+            <h4 class="font-bold text-sm mb-2" style="color: #15803d;">✓ 장점</h4>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div v-for="(benefit, i) in getIngredientData(showIngredientDetail).benefits" :key="i" style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #22c55e;"></div>
+                <span class="text-sm text-gray">{{ benefit }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 주의사항 -->
+          <div v-if="getIngredientData(showIngredientDetail).concerns" style="margin-bottom: 16px;">
+            <h4 class="font-bold text-sm mb-2" style="color: #991b1b;">! 주의사항</h4>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div v-for="(concern, i) in getIngredientData(showIngredientDetail).concerns" :key="i" style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444;"></div>
+                <span class="text-sm text-gray">{{ concern }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 알러지 경고 -->
+          <div v-if="currentPet.allergies && currentPet.allergies.some(allergy => showIngredientDetail.toLowerCase().includes(allergy.toLowerCase()))" 
+               class="alert-danger" style="margin-bottom: 16px;">
+            <span style="font-size: 20px;">⚠️</span>
+            <div class="alert-content">
+              <p class="text-sm font-bold" style="color: #991b1b;">
+                {{ currentPet.name }}의 알러지 성분과 관련이 있을 수 있습니다
+              </p>
+            </div>
+          </div>
+
+          <!-- 관련 정보 -->
+          <div style="background: #f9fafb; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+            <p class="text-xs text-gray">
+              💡 이 정보는 AAFCO, FEDIAF 기준과 수의학 연구를 바탕으로 작성되었습니다.
+            </p>
+          </div>
+
+          <button @click="showIngredientDetail = null" class="btn btn-primary btn-full">확인</button>
         </div>
       </div>
     </div>
 
     <!-- Community Page -->
     <div v-if="currentPage === 'community'" class="container">
-      <div class="flex-between mb-4">
-        <h2 class="font-bold" style="font-size: 24px;">커뮤니티</h2>
-        <button class="btn btn-primary">글쓰기</button>
-      </div>
+      <!-- 게시글 목록 -->
+      <div v-if="!selectedPost">
+        <div class="flex-between mb-4">
+          <h2 class="font-bold" style="font-size: 24px;">커뮤니티</h2>
+          <button @click="showPostForm = true" class="btn btn-primary">글쓰기</button>
+        </div>
 
-      <div class="info-card mb-4">
-        <p class="text-sm font-bold" style="color: #a855f7;">💬 보호자들과 소통해요</p>
-        <p class="text-xs mt-1" style="color: #a855f7;">
-          펫푸드 고민, 사료 추천, 건강 정보 등을 자유롭게 나눠보세요!
-        </p>
-      </div>
-
-      <div v-for="post in communityPosts" :key="post.id" class="post-item">
-        <div class="post-author">
-          <div class="author-avatar">{{ post.author[0] }}</div>
-          <div>
-            <p class="font-bold text-sm">{{ post.author }}</p>
-            <p class="text-xs text-gray">{{ post.pet }}</p>
+        <div class="info-card mb-4">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="chronipet-icon-teal.png" alt="크로니펫" style="width: 40px; height: 40px;">
+            <div style="flex: 1;">
+              <p class="text-sm font-bold" style="color: #a855f7;">💬 보호자들과 소통해요</p>
+              <p class="text-xs mt-1" style="color: #a855f7;">
+                펫푸드 고민, 사료 추천, 건강 정보 등을 자유롭게 나눠보세요!
+              </p>
+            </div>
           </div>
         </div>
-        <h3 class="font-bold mb-1">{{ post.title }}</h3>
-        <p class="text-sm text-gray" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-          {{ post.content }}
-        </p>
-        <div class="post-meta">
-          <span>💬 {{ post.comments }}</span>
-          <span>❤️ {{ post.likes }}</span>
-          <span>🕐 {{ post.time }}</span>
+
+        <!-- 카테고리 탭 -->
+        <div class="category-tabs">
+          <button 
+            v-for="category in postCategories" 
+            :key="category"
+            @click="selectedCategory = category"
+            class="category-tab"
+            :class="{active: selectedCategory === category}"
+          >
+            {{ category }}
+          </button>
+        </div>
+
+        <!-- 게시글 목록 -->
+        <div v-for="post in filteredPosts" :key="post.id" @click="viewPost(post)" class="post-item">
+          <div class="post-author">
+            <div class="author-avatar">{{ post.author[0] }}</div>
+            <div style="flex: 1;">
+              <p class="font-bold text-sm">{{ post.author }}</p>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <p class="text-xs text-gray">{{ post.pet }}</p>
+                <span class="text-xs" style="color: #14b8a6; background: #f0fdfa; padding: 2px 8px; border-radius: 10px;">
+                  {{ post.category }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <h3 class="font-bold mb-1">{{ post.title }}</h3>
+          <p class="text-sm text-gray" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            {{ post.content }}
+          </p>
+          <div v-if="post.hasImage" class="post-image" style="height: 120px; margin: 8px 0;">
+            📷 이미지 포함
+          </div>
+          <div class="post-meta">
+            <span class="post-meta-item">💬 {{ post.comments.length }}</span>
+            <span class="post-meta-item" :class="{liked: post.isLiked}">❤️ {{ post.likes }}</span>
+            <span>🕐 {{ post.time }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 게시글 상세 -->
+      <div v-else>
+        <button @click="closePost" class="btn btn-secondary mb-4">← 목록으로</button>
+        
+        <div class="card mb-4">
+          <div class="post-author">
+            <div class="author-avatar">{{ selectedPost.author[0] }}</div>
+            <div style="flex: 1;">
+              <p class="font-bold">{{ selectedPost.author }}</p>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <p class="text-xs text-gray">{{ selectedPost.pet }} • {{ selectedPost.time }}</p>
+                <span class="text-xs" style="color: #14b8a6; background: #f0fdfa; padding: 2px 8px; border-radius: 10px;">
+                  {{ selectedPost.category }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <h2 class="font-bold mb-3" style="font-size: 20px;">{{ selectedPost.title }}</h2>
+          <p class="text-gray" style="line-height: 1.7; white-space: pre-line;">{{ selectedPost.content }}</p>
+          
+          <div v-if="selectedPost.hasImage" class="post-image">
+            사진 샘플 이미지
+          </div>
+          
+          <div style="display: flex; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+            <button @click="toggleLike" class="post-meta-item" :class="{liked: selectedPost.isLiked}" style="border: none; background: none; padding: 0;">
+              <span>❤️</span>
+              <span>{{ selectedPost.likes }}</span>
+            </button>
+            <div class="post-meta-item">
+              <span>💬</span>
+              <span>{{ selectedPost.comments.length }}</span>
+            </div>
+            <button @click="showShareReport = true" class="post-meta-item" style="border: none; background: none; padding: 0; margin-left: auto;">
+              <span>📤</span>
+              <span>공유</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 댓글 섹션 -->
+        <div class="card">
+          <h3 class="font-bold mb-4">댓글 {{ selectedPost.comments.length }}개</h3>
+          
+          <div v-for="comment in selectedPost.comments" :key="comment.id" style="margin-bottom: 16px;">
+            <div class="comment-item" :class="{reply: comment.isReply}">
+              <div class="flex gap-3 mb-2">
+                <div class="author-avatar small">{{ comment.author[0] }}</div>
+                <div style="flex: 1;">
+                  <div class="flex-between">
+                    <p class="text-sm font-bold">{{ comment.author }}</p>
+                    <p class="text-xs text-gray">{{ comment.time }}</p>
+                  </div>
+                  <p class="text-sm" style="color: #374151; margin-top: 4px; line-height: 1.5;">{{ comment.content }}</p>
+                  <div class="comment-actions">
+                    <button @click="likeComment(comment.id)" class="comment-action">
+                      ❤️ {{ comment.likes }}
+                    </button>
+                    <button @click="showReplyForm(comment.id)" class="comment-action">
+                      답글
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 답글 입력 폼 -->
+            <div v-if="replyingTo === comment.id" style="margin-left: 40px; margin-top: 8px;">
+              <textarea 
+                v-model="replyContent"
+                class="textarea"
+                rows="2"
+                placeholder="답글을 입력하세요..."
+              ></textarea>
+              <div class="flex gap-2 mt-2">
+                <button @click="cancelReply" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">취소</button>
+                <button @click="submitReply(comment.id)" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">답글 작성</button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 댓글 입력 -->
+          <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+            <textarea 
+              v-model="newComment"
+              class="textarea"
+              rows="3"
+              placeholder="댓글을 입력하세요..."
+            ></textarea>
+            <button @click="submitComment" class="btn btn-primary mt-2">댓글 작성</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 글쓰기 모달 -->
+      <div v-if="showPostForm" class="modal-overlay" @click.self="showPostForm = false">
+        <div class="modal">
+          <h3 class="font-bold mb-4" style="font-size: 20px;">게시글 작성</h3>
+          
+          <div class="form-group">
+            <label class="form-label">카테고리</label>
+            <select v-model="newPostData.category" class="form-input">
+              <option v-for="cat in postCategories.slice(1)" :key="cat" :value="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">제목</label>
+            <input v-model="newPostData.title" type="text" class="form-input" placeholder="제목을 입력하세요">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">내용</label>
+            <textarea v-model="newPostData.content" class="textarea" rows="6" placeholder="내용을 입력하세요..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input v-model="newPostData.hasImage" type="checkbox">
+              <span class="text-sm">이미지 포함</span>
+            </label>
+          </div>
+
+          <div class="flex gap-2">
+            <button @click="showPostForm = false" class="btn btn-secondary" style="flex: 1;">취소</button>
+            <button @click="submitPost" class="btn btn-primary" style="flex: 1;">작성하기</button>
+          </div>
         </div>
       </div>
     </div>
@@ -992,12 +1795,17 @@
       <h2 class="font-bold mb-4" style="font-size: 24px;">건강 리포트</h2>
       
       <div class="gradient-card">
-        <p style="font-size: 14px; opacity: 0.9;">이번 달 {{ currentPet.name }}의 건강 점수</p>
-        <div style="display: flex; align-items: end; gap: 8px; margin-top: 8px;">
-          <span style="font-size: 48px; font-weight: bold;">92</span>
-          <span style="font-size: 24px; margin-bottom: 4px;">점</span>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <img src="chronipet-icon-white.png" alt="크로니펫" style="width: 80px; height: 80px; filter: brightness(0) invert(1);">
+          <div style="flex: 1;">
+            <p style="font-size: 14px; opacity: 0.9;">이번 달 {{ currentPet.name }}의 건강 점수</p>
+            <div style="display: flex; align-items: end; gap: 8px; margin-top: 8px;">
+              <span style="font-size: 48px; font-weight: bold;">92</span>
+              <span style="font-size: 24px; margin-bottom: 4px;">점</span>
+            </div>
+            <p style="font-size: 14px; margin-top: 8px; opacity: 0.9;">지난달 대비 +5점 상승 🎉</p>
+          </div>
         </div>
-        <p style="font-size: 14px; margin-top: 8px; opacity: 0.9;">지난달 대비 +5점 상승 🎉</p>
       </div>
 
       <div class="card">
@@ -1039,6 +1847,22 @@
           </div>
         </div>
       </div>
+
+      <div class="info-card">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="chronipet-icon-teal.png" alt="크로니펫" style="width: 56px; height: 56px;">
+          <div style="flex: 1;">
+            <p class="text-sm font-bold" style="color: #a855f7;">크로니펫과 함께하는 건강한 내일</p>
+            <p class="text-xs mt-1" style="color: #a855f7;">
+              {{ currentPet.name }}의 건강 데이터가 펫푸드 산업을 변화시킵니다
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <button @click="showShareReport = true" class="btn btn-primary btn-full">
+        📤 이번 달 리포트 공유하기
+      </button>
     </div>
 
     <!-- My Page -->
@@ -1047,13 +1871,16 @@
       
       <div style="background: #f0fdfa; border: 1px solid #5eead4; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
         <div class="flex-between">
-          <div>
+          <div style="flex: 1;">
             <p class="text-sm" style="color: #0f766e;">내 마일리지</p>
             <p style="font-size: 32px; font-weight: bold; color: #0f766e; margin-top: 4px;">{{ mileage.toLocaleString() }}P</p>
           </div>
-          <div style="font-size: 64px; color: #14b8a6;">🏆</div>
+          <img src="chronipet-icon-teal.png" alt="크로니펫" style="width: 80px; height: 80px;">
         </div>
-        <button class="btn btn-primary btn-full mt-4">포인트 사용하기</button>
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+          <button @click="showMileageShop = true" class="btn btn-primary" style="flex: 1;">포인트 사용</button>
+          <button @click="showInviteFriend = true" class="btn btn-secondary" style="flex: 1;">친구 초대</button>
+        </div>
       </div>
 
       <div class="card">
@@ -1118,6 +1945,200 @@
     <!-- Toast -->
     <div v-if="showToast" class="toast">{{ toastMessage }}</div>
 
+    <!-- 리포트 공유 모달 -->
+    <div v-if="showShareReport" class="modal-overlay" @click.self="showShareReport = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="font-bold" style="font-size: 20px;">건강 리포트 공유</h3>
+          <button @click="showShareReport = false" class="modal-close">×</button>
+        </div>
+
+        <div class="share-card">
+          <img src="chronipet-icon-white.png" alt="크로니펫" style="width: 80px; height: 80px; margin: 0 auto 16px; filter: brightness(0) invert(1);">
+          <h3 class="font-bold" style="font-size: 24px; margin-bottom: 8px;">{{ currentPet.name }}의 건강 점수</h3>
+          <p style="font-size: 48px; font-weight: bold; margin: 16px 0;">92점</p>
+          <p style="opacity: 0.9;">이번 달 변 정상률 {{ normalStoolRate }}%</p>
+          <p style="font-size: 12px; opacity: 0.8; margin-top: 8px;">크로니펫과 함께하는 {{ streak }}일</p>
+        </div>
+
+        <p class="text-sm text-gray text-center mb-3">친구들에게 자랑해보세요!</p>
+
+        <div class="share-buttons">
+          <button @click="shareToSocial('instagram')" class="share-btn">
+            <span style="font-size: 24px;">📷</span>
+            <span style="font-size: 11px; color: #6b7280;">인스타</span>
+          </button>
+          <button @click="shareToSocial('kakao')" class="share-btn">
+            <span style="font-size: 24px;">💬</span>
+            <span style="font-size: 11px; color: #6b7280;">카카오</span>
+          </button>
+          <button @click="shareToSocial('link')" class="share-btn">
+            <span style="font-size: 24px;">🔗</span>
+            <span style="font-size: 11px; color: #6b7280;">링크복사</span>
+          </button>
+        </div>
+
+        <p class="text-xs text-gray text-center mt-4">
+          💡 공유하면 100P를 추가로 드려요!
+        </p>
+      </div>
+    </div>
+
+    <!-- 친구 초대 모달 -->
+    <div v-if="showInviteFriend" class="modal-overlay" @click.self="showInviteFriend = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="font-bold" style="font-size: 20px;">친구 초대하기</h3>
+          <button @click="showInviteFriend = false" class="modal-close">×</button>
+        </div>
+
+        <img src="chronipet-icon-teal.png" alt="크로니펫" style="width: 100px; height: 100px; margin: 0 auto 20px;">
+
+        <div class="invite-code-box">
+          <p class="text-sm text-gray mb-2">내 초대 코드</p>
+          <div class="invite-code">{{ inviteCode }}</div>
+          <button @click="copyInviteCode" class="btn btn-primary btn-full mt-3">
+            📋 코드 복사
+          </button>
+        </div>
+
+        <div class="card" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #fbbf24; margin: 16px 0;">
+          <h4 class="font-bold mb-2" style="color: #92400e;">🎁 초대 리워드</h4>
+          <div style="display: flex; justify-content: space-around; text-align: center;">
+            <div>
+              <p class="text-xs" style="color: #92400e;">친구가 가입하면</p>
+              <p class="font-bold" style="color: #92400e; font-size: 20px;">500P</p>
+            </div>
+            <div style="width: 1px; background: #fbbf24;"></div>
+            <div>
+              <p class="text-xs" style="color: #92400e;">친구가 받는 혜택</p>
+              <p class="font-bold" style="color: #92400e; font-size: 20px;">300P</p>
+            </div>
+          </div>
+        </div>
+
+        <button @click="shareInvite" class="btn btn-primary btn-full">
+          📤 초대 링크 공유
+        </button>
+      </div>
+    </div>
+
+    <!-- 마일리지샵 모달 -->
+    <div v-if="showMileageShop" class="modal-overlay" @click.self="showMileageShop = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 class="font-bold" style="font-size: 20px;">마일리지샵</h3>
+          <button @click="showMileageShop = false" class="modal-close">×</button>
+        </div>
+
+        <div style="background: #f0fdfa; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 16px;">
+          <p class="text-sm" style="color: #0f766e;">보유 마일리지</p>
+          <p style="font-size: 32px; font-weight: bold; color: #0f766e;">{{ mileage.toLocaleString() }}P</p>
+        </div>
+
+        <!-- 프리미엄 -->
+        <div class="mileage-item premium" @click="showPremiumPreview = true">
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <span style="background: #a855f7; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">PREMIUM</span>
+              <span class="font-bold">프리미엄 7일 체험</span>
+            </div>
+            <p class="text-xs text-gray">AI 맞춤 추천 + 광고 제거</p>
+          </div>
+          <div class="text-right">
+            <p class="font-bold text-teal" style="font-size: 18px;">1,000P</p>
+            <p class="text-xs text-gray">7,900원 상당</p>
+          </div>
+        </div>
+
+        <!-- 일반 상품 -->
+        <div class="mileage-item">
+          <div style="flex: 1;">
+            <p class="font-bold">스타벅스 아메리카노 Tall</p>
+            <p class="text-xs text-gray">모바일 쿠폰 발송</p>
+          </div>
+          <p class="font-bold text-teal" style="font-size: 18px;">4,500P</p>
+        </div>
+
+        <div class="mileage-item">
+          <div style="flex: 1;">
+            <p class="font-bold">펫샵 5,000원 할인쿠폰</p>
+            <p class="text-xs text-gray">전국 가맹점 사용</p>
+          </div>
+          <p class="font-bold text-teal" style="font-size: 18px;">3,000P</p>
+        </div>
+
+        <div class="mileage-item">
+          <div style="flex: 1;">
+            <p class="font-bold">동물병원 10% 할인</p>
+            <p class="text-xs text-gray">제휴 병원 한정</p>
+          </div>
+          <p class="font-bold text-teal" style="font-size: 18px;">2,000P</p>
+        </div>
+
+        <p class="text-xs text-gray text-center mt-4">
+          💡 더 많은 상품이 곧 추가됩니다!
+        </p>
+      </div>
+    </div>
+
+    <!-- 프리미엄 프리뷰 모달 -->
+    <div v-if="showPremiumPreview" class="modal-overlay" @click.self="showPremiumPreview = false">
+      <div class="modal">
+        <button @click="showPremiumPreview = false" class="modal-close" style="position: absolute; top: 16px; right: 16px;">×</button>
+        
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+            <span style="font-size: 40px;">👑</span>
+          </div>
+          <h2 class="font-bold mb-2" style="font-size: 24px;">크로니펫 프리미엄</h2>
+          <p class="text-gray">{{ currentPet.name }}를 위한 특별한 경험</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+          <div style="display: flex; gap: 12px; align-items: start;">
+            <span style="font-size: 24px;">🤖</span>
+            <div>
+              <p class="font-bold">AI 맞춤 추천</p>
+              <p class="text-sm text-gray">건강 데이터 기반 최적 사료 추천</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: start;">
+            <span style="font-size: 24px;">📊</span>
+            <div>
+              <p class="font-bold">상세 건강 리포트</p>
+              <p class="text-sm text-gray">월간 PDF 리포트 + 트렌드 분석</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: start;">
+            <span style="font-size: 24px;">🚫</span>
+            <div>
+              <p class="font-bold">광고 없는 환경</p>
+              <p class="text-sm text-gray">방해 없이 깨끗한 사용 경험</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: start;">
+            <span style="font-size: 24px;">🔄</span>
+            <div>
+              <p class="font-bold">무제한 제품 비교</p>
+              <p class="text-sm text-gray">원하는 만큼 제품 비교 분석</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fdf4ff 0%, #fce7f3 100%); border: 2px solid #f0abfc; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 16px;">
+          <p class="text-sm" style="color: #a855f7; margin-bottom: 8px;">7일 무료 체험 후</p>
+          <p style="font-size: 28px; font-weight: bold; color: #a855f7;">월 3,900원</p>
+          <p class="text-xs" style="color: #a855f7; margin-top: 4px;">언제든지 해지 가능</p>
+        </div>
+
+        <button class="btn btn-primary btn-full">7일 무료로 시작하기</button>
+        <p class="text-xs text-gray text-center mt-2">
+          또는 1,000P로 체험권 구매
+        </p>
+      </div>
+    </div>
+
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
       <button @click="currentPage = 'home'" class="nav-item" :class="{active: currentPage === 'home'}">
@@ -1157,12 +2178,38 @@
         showQuestComplete: false,
         showPetSelector: false,
         showIngredientDetail: null,
+        showPostForm: false,
+        showQuestDetail: null,
+        showSplash: true,
+        showOnboarding: false,
+        showInviteFriend: false,
+        showShareReport: false,
+        showMileageShop: false,
+        showPremiumPreview: false,
+        onboardingStep: 1,
         showToast: false,
         toastMessage: '',
         compareMode: false,
         selectedCompareProducts: [],
         searchTerm: '',
         selectedProduct: null,
+        selectedPost: null,
+        selectedCategory: '전체',
+        questTab: 'daily',
+        ingredientFilter: 'all',
+        reportPeriod: 'week',
+        newComment: '',
+        replyingTo: null,
+        replyContent: '',
+        streak: 7,
+        inviteCode: 'HAPPY2025',
+        productSuggestions: [],
+        newPostData: {
+          category: '사료 추천',
+          title: '',
+          content: '',
+          hasImage: false
+        },
         
         currentPet: {
           id: 1,
@@ -1181,9 +2228,18 @@
         ],
         
         quests: [
-          { id: 1, title: '오늘의 사료 기록하기', reward: 100, completed: false, week: 1 },
-          { id: 2, title: '변 상태 체크하기', reward: 50, completed: false, week: 1 },
-          { id: 3, title: '제품 위키 등록하기', reward: 200, completed: false, week: 1 }
+          // 일일 퀘스트
+          { id: 1, title: '오늘의 사료 기록하기', desc: '급여 기록 1회 작성', reward: 100, completed: false, type: 'daily', progress: 0, max: 1 },
+          { id: 2, title: '변 상태 체크하기', desc: '건강 상태 모니터링', reward: 50, completed: false, type: 'daily', progress: 0, max: 1 },
+          { id: 3, title: '위키 둘러보기', desc: '제품 정보 3개 이상 확인', reward: 30, completed: false, type: 'daily', progress: 1, max: 3 },
+          // 주간 퀘스트
+          { id: 4, title: '제품 위키 등록하기', desc: '새로운 제품 정보 등록', reward: 200, completed: false, type: 'weekly', progress: 0, max: 1 },
+          { id: 5, title: '5일 연속 기록하기', desc: '꾸준한 건강 관리', reward: 500, completed: false, type: 'weekly', progress: 3, max: 5 },
+          { id: 6, title: '커뮤니티 활동하기', desc: '게시글 3개 작성 또는 댓글 10개', reward: 300, completed: false, type: 'weekly', progress: 2, max: 10 },
+          // 월간 퀘스트
+          { id: 7, title: '한 달 완벽 기록', desc: '30일 중 25일 이상 기록', reward: 2000, completed: false, type: 'monthly', progress: 18, max: 25 },
+          { id: 8, title: '건강 리포트 공유', desc: '월간 리포트 SNS 공유', reward: 1000, completed: false, type: 'monthly', progress: 0, max: 1 },
+          { id: 9, title: '반려동물 친구 초대', desc: '친구 3명 앱 가입시키기', reward: 3000, completed: false, type: 'monthly', progress: 1, max: 3 }
         ],
         
         records: [
@@ -1231,7 +2287,27 @@
             records: 1368,
             image: 'https://via.placeholder.com/200x200/00C4B4/ffffff?text=Royal+Canin',
             price: '42,000원',
-            ingredients: ['닭고기분', '쌀', '옥수수', '동물성지방', '식물성단백질', '비트펄프'],
+            ingredients: [
+              { name: '닭고기분', percentage: 28, order: 1 },
+              { name: '쌀', percentage: 22, order: 2 },
+              { name: '옥수수', percentage: 15, order: 3 },
+              { name: '동물성지방', percentage: 12, order: 4 },
+              { name: '식물성단백질', percentage: 8, order: 5 },
+              { name: '비트펄프', percentage: 5, order: 6 },
+              { name: '해바라기오일', percentage: 3, order: 7 },
+              { name: '어유', percentage: 2, order: 8 },
+              { name: '미네랄', percentage: 5, order: 9 }
+            ],
+            nutrition: {
+              protein: '28%',
+              fat: '16%',
+              fiber: '3.5%',
+              moisture: '10%',
+              ash: '6.5%',
+              calcium: '1.2%',
+              phosphorus: '0.9%'
+            },
+            certifications: ['AAFCO 기준 충족', 'ISO 인증'],
             positiveKeywords: [
               { text: '기호성 좋아요', count: 892 },
               { text: '소화 잘돼요', count: 654 },
@@ -1246,7 +2322,30 @@
             records: 1026,
             image: 'https://via.placeholder.com/200x200/FF6B9D/ffffff?text=Orijen',
             price: '89,000원',
-            ingredients: ['생닭고기', '생칠면조고기', '생연어', '탈수닭고기', '닭간', '칠면조간', '렌틸콩', '완두콩'],
+            ingredients: [
+              { name: '생닭고기', percentage: 18, order: 1 },
+              { name: '생칠면조고기', percentage: 15, order: 2 },
+              { name: '생연어', percentage: 12, order: 3 },
+              { name: '탈수닭고기', percentage: 10, order: 4 },
+              { name: '닭간', percentage: 8, order: 5 },
+              { name: '칠면조간', percentage: 6, order: 6 },
+              { name: '전란', percentage: 5, order: 7 },
+              { name: '렌틸콩', percentage: 8, order: 8 },
+              { name: '완두콩', percentage: 7, order: 9 },
+              { name: '병아리콩', percentage: 5, order: 10 },
+              { name: '통청어', percentage: 4, order: 11 },
+              { name: '통정어리', percentage: 2, order: 12 }
+            ],
+            nutrition: {
+              protein: '38%',
+              fat: '18%',
+              fiber: '4%',
+              moisture: '12%',
+              ash: '8%',
+              calcium: '1.4%',
+              phosphorus: '1.1%'
+            },
+            certifications: ['AAFCO 기준 충족', 'FEDIAF 승인', 'WDJ 추천'],
             positiveKeywords: [
               { text: '기호성 최고', count: 1545 },
               { text: '변이 좋아졌어요', count: 876 },
@@ -1256,12 +2355,27 @@
         ],
         
         ingredientGrades: {
-          '생닭고기': { grade: 'safe', reason: '신선한 육류 단백질', description: '소화가 잘되고 영양가가 높은 고품질 동물성 단백질입니다.' },
-          '생칠면조고기': { grade: 'safe', reason: '저지방 고단백', description: '알레르기 반응이 적고 지방 함량이 낮은 우수한 단백질원입니다.' },
-          '닭고기분': { grade: 'caution', reason: '가공 육류', description: '탈수 처리된 닭고기로, 신선육보다 영양가는 낮지만 보관이 용이합니다.' },
-          '쌀': { grade: 'caution', reason: '탄수화물원', description: '소화가 잘되는 탄수화물이지만, 과다 섭취 시 혈당 상승 가능성이 있습니다.' },
-          '옥수수': { grade: 'warning', reason: '알러지 유발', description: '충진제로 사용되며 알러지 반응과 소화 불량을 유발할 수 있습니다.' },
-          '동물성지방': { grade: 'warning', reason: '출처 불명확', description: '어떤 동물의 지방인지 명시되지 않아 품질 확인이 어렵습니다.' }
+          '생닭고기': { grade: 'safe', reason: '신선한 육류 단백질', description: '소화가 잘되고 영양가가 높은 고품질 동물성 단백질입니다.', benefits: ['고단백', '소화 용이', '근육 발달', '아미노산 풍부'], concerns: [] },
+          '생칠면조고기': { grade: 'safe', reason: '저지방 고단백', description: '알레르기 반응이 적고 지방 함량이 낮은 우수한 단백질원입니다.', benefits: ['저알러지', '저지방', '고단백', '면역력 강화'], concerns: [] },
+          '생연어': { grade: 'safe', reason: '오메가-3 풍부', description: '피부와 털 건강에 도움을 주는 오메가-3 지방산이 풍부합니다.', benefits: ['피부 건강', '털 윤기', '항염 효과', '심혈관 건강'], concerns: [] },
+          '닭간': { grade: 'safe', reason: '비타민A 풍부', description: '비타민과 미네랄이 풍부한 영양 밀집 식재료입니다.', benefits: ['비타민A', '철분', '기호성 향상', '면역력'], concerns: ['과다 섭취 시 비타민A 과잉'] },
+          '전란': { grade: 'safe', reason: '완전 단백질', description: '필수 아미노산이 모두 포함된 완벽한 단백질원입니다.', benefits: ['완전단백', '소화 우수', '레시틴', '비오틴'], concerns: [] },
+          '칠면조간': { grade: 'safe', reason: '비타민 풍부', description: '비타민과 미네랄이 풍부한 영양 밀집 식재료입니다.', benefits: ['비타민B군', '철분', '아연'], concerns: ['과다 섭취 주의'] },
+          '통청어': { grade: 'safe', reason: '오메가-3 풍부', description: '통째로 사용한 청어로 영양소가 풍부합니다.', benefits: ['오메가-3', '칼슘', '인'], concerns: [] },
+          '통정어리': { grade: 'safe', reason: '오메가-3 풍부', description: '작은 생선으로 뼈째 먹어 칼슘이 풍부합니다.', benefits: ['오메가-3', '칼슘', '비타민D'], concerns: [] },
+          '닭고기분': { grade: 'caution', reason: '가공 육류', description: '탈수 처리된 닭고기로, 신선육보다 영양가는 낮지만 보관이 용이합니다.', benefits: ['단백질 공급', '보존성'], concerns: ['가공 과정에서 영양 손실', '신선육 대비 품질 낮음'] },
+          '탈수닭고기': { grade: 'caution', reason: '가공 육류', description: '수분을 제거한 닭고기로 농축된 단백질을 제공합니다.', benefits: ['농축 단백질', '보존 용이'], concerns: ['가공 과정', '영양소 일부 손실'] },
+          '쌀': { grade: 'caution', reason: '탄수화물원', description: '소화가 잘되는 탄수화물이지만, 과다 섭취 시 혈당 상승 가능성이 있습니다.', benefits: ['소화 용이', '에너지원'], concerns: ['혈당 상승', '곡물 알러지', '영양가 낮음'] },
+          '렌틸콩': { grade: 'caution', reason: '식물성 단백질', description: '섬유질과 단백질이 풍부하지만 과다 섭취 시 소화 부담이 있을 수 있습니다.', benefits: ['섬유질', '식물성 단백질', '철분'], concerns: ['가스 발생', '소화 부담'] },
+          '완두콩': { grade: 'caution', reason: '식물성 단백질', description: '단백질과 섬유질이 풍부하나 육류 대체재로는 부족합니다.', benefits: ['섬유질', '비타민K', '망간'], concerns: ['소화 부담', '펄스 성분'] },
+          '병아리콩': { grade: 'caution', reason: '식물성 단백질', description: '단백질과 섬유질이 있지만 육류만큼 효율적이지 않습니다.', benefits: ['섬유질', '엽산'], concerns: ['소화 부담', '가스 발생'] },
+          '해바라기오일': { grade: 'caution', reason: '식물성 지방', description: '비타민E가 풍부하지만 오메가-6가 많아 균형이 필요합니다.', benefits: ['비타민E', '에너지'], concerns: ['오메가-6 과다', '염증 유발 가능'] },
+          '어유': { grade: 'safe', reason: 'DHA/EPA 풍부', description: '두뇌 발달과 심혈관 건강에 도움을 주는 오메가-3 지방산이 풍부합니다.', benefits: ['DHA/EPA', '항염', '인지 기능'], concerns: ['산패 주의'] },
+          '미네랄': { grade: 'safe', reason: '필수 영양소', description: '뼈와 치아 건강에 필요한 필수 미네랄입니다.', benefits: ['뼈 건강', '치아 건강', '신경 기능'], concerns: [] },
+          '옥수수': { grade: 'warning', reason: '알러지 유발', description: '충진제로 사용되며 알러지 반응과 소화 불량을 유발할 수 있습니다.', benefits: [], concerns: ['알러지 유발', '소화 어려움', '영양가 낮음', '혈당 급상승'] },
+          '동물성지방': { grade: 'warning', reason: '출처 불명확', description: '어떤 동물의 지방인지 명시되지 않아 품질 확인이 어렵습니다.', benefits: ['에너지 공급', '기호성'], concerns: ['출처 불명', '품질 의심', '산패 위험', '트랜스지방 가능성'] },
+          '식물성단백질': { grade: 'warning', reason: '저급 단백질', description: '동물성 단백질보다 생체이용률이 낮고 알러지를 유발할 수 있습니다.', benefits: [], concerns: ['낮은 흡수율', '아미노산 불균형', '알러지 유발', '소화 어려움'] },
+          '비트펄프': { grade: 'warning', reason: '섬유질 충진제', description: '사탕무 찌꺼기로, 영양가는 낮고 변량을 늘리는 충진제입니다.', benefits: ['섬유질'], concerns: ['영양가 낮음', '소화 부담', '충진제', '설탕 잔류'] }
         },
         
         gradeLabels: {
@@ -1270,26 +2384,248 @@
           warning: '유의'
         },
         
+        postCategories: ['전체', '사료 추천', '건강 상담', '일상 공유', '제품 리뷰', '질문'],
+        
         communityPosts: [
           {
             id: 1,
             author: '해피맘',
             pet: '말티즈 3살',
+            category: '건강 상담',
             title: '사료 바꾸고 나서 변이 무른데 정상인가요?',
-            content: '로얄캐닌에서 오리젠으로 바꾼지 3일째인데 변이 4단계로 무른 편이에요. 적응 기간이 필요한 건지 다시 바꿔야 할지 고민됩니다...',
-            comments: 12,
+            content: '로얄캐닌에서 오리젠으로 바꾼지 3일째인데 변이 4단계로 무른 편이에요. 적응 기간이 필요한 건지 다시 바꿔야 할지 고민됩니다...\n\n급여량은 체중에 맞춰서 주고 있고, 물도 잘 마시고 있어요. 활동성은 평소와 똑같습니다.',
+            hasImage: false,
+            comments: [
+              {
+                id: 1,
+                author: '수의사박',
+                content: '일반적으로 사료를 바꿀 때는 7-10일 정도 기존 사료와 섞어서 급여하는 게 좋습니다. 갑자기 바꾸면 소화기관이 적응하는 데 시간이 걸려요.',
+                time: '1시간 전',
+                likes: 5,
+                isReply: false
+              },
+              {
+                id: 2,
+                author: '해피맘',
+                content: '아 그렇군요! 저는 바로 바꿨어요 ㅠㅠ 다시 섞어서 급여해봐야겠네요. 감사합니다!',
+                time: '50분 전',
+                likes: 2,
+                isReply: true
+              },
+              {
+                id: 3,
+                author: '뭉치집사',
+                content: '저희 강아지도 비슷한 경험 있어요. 일주일 정도 지나니까 괜찮아졌습니다!',
+                time: '30분 전',
+                likes: 3,
+                isReply: false
+              }
+            ],
             likes: 8,
+            isLiked: false,
             time: '2시간 전'
           },
           {
             id: 2,
             author: '초코집사',
             pet: '코숏 2살',
+            category: '사료 추천',
             title: '고양이 사료 추천 부탁드려요!',
-            content: '알러지가 있는 고양이인데 저자극 사료 찾고 있어요. 연어 베이스로 괜찮은 제품 있을까요?',
-            comments: 24,
+            content: '알러지가 있는 고양이인데 저자극 사료 찾고 있어요. 연어 베이스로 괜찮은 제품 있을까요?\n\n현재 오리젠 고양이 사료를 먹이고 있는데, 가격이 부담되네요 ㅠㅠ',
+            hasImage: false,
+            comments: [
+              {
+                id: 4,
+                author: '냥이러버',
+                content: '아카나 와일드 프레리 캣 추천드려요! 연어 베이스에 가격도 오리젠보다 저렴해요.',
+                time: '3시간 전',
+                likes: 8,
+                isReply: false
+              },
+              {
+                id: 5,
+                author: '초코집사',
+                content: '오 감사합니다! 한번 찾아볼게요 :)',
+                time: '2시간 전',
+                likes: 1,
+                isReply: true
+              }
+            ],
             likes: 15,
+            isLiked: false,
             time: '5시간 전'
+          },
+          {
+            id: 3,
+            author: '몽이아빠',
+            pet: '시츄 5살',
+            category: '제품 리뷰',
+            title: '기호성 좋은 사료 찾았어요 (후기)',
+            content: '저희 몽이가 입이 짧아서 사료를 잘 안먹었는데, 아카나로 바꾸니까 그릇을 싹싹 긁어먹네요 ㅎㅎ\n\n다만 가격이 좀 부담되긴 하는데, 몽이가 잘 먹으니까 만족합니다!\n\n변 상태도 좋아지고 털도 윤기가 나는 것 같아요.',
+            hasImage: true,
+            comments: [
+              {
+                id: 6,
+                author: '댕댕이맘',
+                content: '저희 강아지도 아카나 먹여요! 정말 좋더라구요',
+                time: '1일 전',
+                likes: 4,
+                isReply: false
+              },
+              {
+                id: 7,
+                author: '루피주인',
+                content: '가격이 어느정도 하나요?',
+                time: '1일 전',
+                likes: 0,
+                isReply: false
+              },
+              {
+                id: 8,
+                author: '몽이아빠',
+                content: '6kg에 8만원 정도 하는 것 같아요!',
+                time: '1일 전',
+                likes: 2,
+                isReply: true
+              }
+            ],
+            likes: 42,
+            isLiked: true,
+            time: '1일 전'
+          },
+          {
+            id: 4,
+            author: '복실맘',
+            pet: '포메라니안 2살',
+            category: '일상 공유',
+            title: '오늘 복실이 첫 미용 다녀왔어요 💕',
+            content: '너무 귀여워서 자랑하고 싶어서 올려봅니다 ㅎㅎ\n\n미용하고 나니까 더 활발해진 것 같아요. 사료도 더 잘 먹고요!\n\n여러분 반려견 미용은 어떻게 하시나요?',
+            hasImage: true,
+            comments: [
+              {
+                id: 9,
+                author: '뭉치집사',
+                content: '너무 귀여워요!! 어디서 미용하셨어요?',
+                time: '2일 전',
+                likes: 6,
+                isReply: false
+              },
+              {
+                id: 10,
+                author: '복실맘',
+                content: '집 근처 동네 미용실인데 추천해드릴게요!',
+                time: '2일 전',
+                likes: 3,
+                isReply: true
+              }
+            ],
+            likes: 28,
+            isLiked: false,
+            time: '2일 전'
+          },
+          {
+            id: 5,
+            author: '냥집사',
+            pet: '브리티시숏헤어 4살',
+            category: '질문',
+            title: '고양이 사료 급여량 질문이요',
+            content: '4kg 고양이인데 하루에 얼마나 먹여야 하나요?\n\n지금은 아침 저녁으로 40g씩 주고 있는데 적당한가요?',
+            hasImage: false,
+            comments: [
+              {
+                id: 11,
+                author: '수의사박',
+                content: '고양이 활동량과 나이에 따라 다른데, 일반적으로 4kg 성묘는 하루 60-80g 정도가 적당합니다.',
+                time: '3일 전',
+                likes: 12,
+                isReply: false
+              }
+            ],
+            likes: 7,
+            isLiked: false,
+            time: '3일 전'
+          },
+          {
+            id: 6,
+            author: '골댕이파파',
+            pet: '골든리트리버 1살',
+            category: '건강 상담',
+            title: '퍼피에서 성견 사료로 언제 바꿔야 하나요?',
+            content: '우리 골댕이가 이제 1살이 됐는데, 성견 사료로 바꿔야 할 시기인가요?\n\n아직도 퍼피 사료 먹고 있는데 괜찮을까요?',
+            hasImage: false,
+            comments: [
+              {
+                id: 12,
+                author: '대형견전문',
+                content: '대형견은 보통 12-18개월에 성견 사료로 전환합니다. 골든은 18개월 정도가 적당해요.',
+                time: '4일 전',
+                likes: 9,
+                isReply: false
+              },
+              {
+                id: 13,
+                author: '골댕이파파',
+                content: '아하! 그럼 조금 더 퍼피 사료 먹여도 되겠네요. 감사합니다!',
+                time: '4일 전',
+                likes: 1,
+                isReply: true
+              }
+            ],
+            likes: 11,
+            isLiked: false,
+            time: '4일 전'
+          },
+          {
+            id: 7,
+            author: '치와와맘',
+            pet: '치와와 3살',
+            category: '제품 리뷰',
+            title: '로얄캐닌 소형견 사료 후기',
+            content: '로얄캐닌 소형견용 먹인지 3개월 됐는데 후기 남겨요.\n\n장점: 변 상태 좋아짐, 알갱이 크기 적당, 가격 합리적\n단점: 냄새가 좀 강한 편\n\n전반적으로 만족하고 있어요!',
+            hasImage: false,
+            comments: [
+              {
+                id: 14,
+                author: '포메주인',
+                content: '저도 로얄캐닌 먹이고 있어요! 변 정말 좋아지더라구요',
+                time: '5일 전',
+                likes: 5,
+                isReply: false
+              }
+            ],
+            likes: 19,
+            isLiked: false,
+            time: '5일 전'
+          },
+          {
+            id: 8,
+            author: '스핑크스러버',
+            pet: '스핑크스 2살',
+            category: '사료 추천',
+            title: '무모종 고양이 사료 추천 부탁해요',
+            content: '스핑크스 키우고 있는데 피부가 민감해서 사료 선택이 어렵네요.\n\n혹시 무모종 고양이에게 좋은 사료 있을까요?',
+            hasImage: false,
+            comments: [
+              {
+                id: 15,
+                author: '냥이러버',
+                content: '로얄캐닌에 스핑크스 전용 사료가 있어요! 한번 찾아보세요',
+                time: '6일 전',
+                likes: 7,
+                isReply: false
+              },
+              {
+                id: 16,
+                author: '스핑크스러버',
+                content: '오 전용 사료가 있군요! 감사합니다 ^^',
+                time: '6일 전',
+                likes: 2,
+                isReply: true
+              }
+            ],
+            likes: 13,
+            isLiked: false,
+            time: '6일 전'
           }
         ]
       },
@@ -1320,9 +2656,59 @@
           if (!this.selectedProduct) return false;
           return this.selectedProduct.ingredients.some(ing =>
             this.currentPet.allergies.some(allergy =>
-              ing.toLowerCase().includes(allergy.toLowerCase())
+              ing.name.toLowerCase().includes(allergy.toLowerCase())
             )
           );
+        },
+        
+        filteredPosts() {
+          if (this.selectedCategory === '전체') {
+            return this.communityPosts;
+          }
+          return this.communityPosts.filter(p => p.category === this.selectedCategory);
+        },
+        
+        dailyQuests() {
+          return this.quests.filter(q => q.type === 'daily');
+        },
+        
+        weeklyQuests() {
+          return this.quests.filter(q => q.type === 'weekly');
+        },
+        
+        monthlyQuests() {
+          return this.quests.filter(q => q.type === 'monthly');
+        },
+        
+        currentQuests() {
+          if (this.questTab === 'daily') return this.dailyQuests;
+          if (this.questTab === 'weekly') return this.weeklyQuests;
+          return this.monthlyQuests;
+        },
+        
+        dailyQuestCompletion() {
+          return this.dailyQuests.filter(q => q.completed).length;
+        },
+        
+        weeklyQuestCompletion() {
+          return this.weeklyQuests.filter(q => q.completed).length;
+        },
+        
+        monthlyQuestCompletion() {
+          return this.monthlyQuests.filter(q => q.completed).length;
+        },
+        
+        currentCompletedQuests() {
+          return this.currentQuests.filter(q => q.completed).length;
+        },
+        
+        currentTotalQuests() {
+          return this.currentQuests.length;
+        },
+        
+        currentQuestCompletionRate() {
+          if (this.currentTotalQuests === 0) return 0;
+          return Math.round(this.currentCompletedQuests / this.currentTotalQuests * 100);
         }
       },
       
@@ -1392,6 +2778,26 @@
           };
         },
         
+        filteredIngredients(ingredients) {
+          if (this.ingredientFilter === 'all') return ingredients;
+          return ingredients.filter(ing => this.getIngredientGrade(ing.name) === this.ingredientFilter);
+        },
+        
+        getQuestTip(questId) {
+          const tips = {
+            1: '매일 같은 시간에 기록하는 습관을 만들어보세요. 알림을 설정하면 도움이 됩니다!',
+            2: '변 상태는 건강의 중요한 지표입니다. 2단계(정상)가 가장 이상적이에요.',
+            3: '다양한 제품을 비교하면서 우리 아이에게 맞는 사료를 찾아보세요.',
+            4: '위키에 등록하면 다른 보호자들에게도 큰 도움이 됩니다!',
+            5: '꾸준한 기록이 건강한 습관을 만듭니다. 화이팅!',
+            6: '커뮤니티에서 다른 보호자들과 정보를 나누면 서로에게 도움이 됩니다.',
+            7: '한 달 동안의 데이터는 건강 패턴을 파악하는 데 매우 중요합니다.',
+            8: '월간 리포트를 공유하면 다른 보호자들에게 좋은 참고 자료가 됩니다.',
+            9: '친구와 함께하면 더 즐겁게 반려동물을 돌볼 수 있어요!'
+          };
+          return tips[questId] || '열심히 도전해보세요!';
+        },
+        
         getStoolCount(level) {
           return this.records.filter(r => r.stool === level).length;
         },
@@ -1399,7 +2805,126 @@
         getStoolPercentage(level) {
           if (this.records.length === 0) return 0;
           return Math.round(this.getStoolCount(level) / this.records.length * 100);
+        },
+        
+        // 커뮤니티 관련 메서드
+        viewPost(post) {
+          this.selectedPost = post;
+          this.newComment = '';
+        },
+        
+        closePost() {
+          this.selectedPost = null;
+          this.replyingTo = null;
+          this.replyContent = '';
+        },
+        
+        toggleLike() {
+          if (this.selectedPost.isLiked) {
+            this.selectedPost.likes--;
+            this.selectedPost.isLiked = false;
+          } else {
+            this.selectedPost.likes++;
+            this.selectedPost.isLiked = true;
+          }
+        },
+        
+        submitComment() {
+          if (this.newComment.trim()) {
+            const newCommentObj = {
+              id: this.selectedPost.comments.length + 1,
+              author: this.currentPet.name + '보호자',
+              content: this.newComment,
+              time: '방금 전',
+              likes: 0,
+              isReply: false
+            };
+            this.selectedPost.comments.push(newCommentObj);
+            this.newComment = '';
+            this.showToast = true;
+            this.toastMessage = '댓글이 작성되었습니다';
+            setTimeout(() => {
+              this.showToast = false;
+            }, 2000);
+          }
+        },
+        
+        showReplyForm(commentId) {
+          this.replyingTo = commentId;
+          this.replyContent = '';
+        },
+        
+        cancelReply() {
+          this.replyingTo = null;
+          this.replyContent = '';
+        },
+        
+        submitReply(parentId) {
+          if (this.replyContent.trim()) {
+            const replyObj = {
+              id: this.selectedPost.comments.length + 1,
+              author: this.currentPet.name + '보호자',
+              content: this.replyContent,
+              time: '방금 전',
+              likes: 0,
+              isReply: true
+            };
+            const parentIndex = this.selectedPost.comments.findIndex(c => c.id === parentId);
+            this.selectedPost.comments.splice(parentIndex + 1, 0, replyObj);
+            this.replyingTo = null;
+            this.replyContent = '';
+            this.showToast = true;
+            this.toastMessage = '답글이 작성되었습니다';
+            setTimeout(() => {
+              this.showToast = false;
+            }, 2000);
+          }
+        },
+        
+        likeComment(commentId) {
+          const comment = this.selectedPost.comments.find(c => c.id === commentId);
+          if (comment) {
+            comment.likes++;
+          }
+        },
+        
+        submitPost() {
+          if (this.newPostData.title.trim() && this.newPostData.content.trim()) {
+            const newPost = {
+              id: this.communityPosts.length + 1,
+              author: this.currentPet.name + '보호자',
+              pet: `${this.currentPet.breed} ${this.currentPet.age}살`,
+              category: this.newPostData.category,
+              title: this.newPostData.title,
+              content: this.newPostData.content,
+              hasImage: this.newPostData.hasImage,
+              comments: [],
+              likes: 0,
+              isLiked: false,
+              time: '방금 전'
+            };
+            this.communityPosts.unshift(newPost);
+            this.showPostForm = false;
+            this.newPostData = {
+              category: '사료 추천',
+              title: '',
+              content: '',
+              hasImage: false
+            };
+            this.showToast = true;
+            this.toastMessage = '게시글이 작성되었습니다';
+            setTimeout(() => {
+              this.showToast = false;
+            }, 2000);
+          }
         }
+      },
+      
+      mounted() {
+        // 스플래시 화면 2초 후 숨기기
+        setTimeout(() => {
+          this.showSplash = false;
+        }, 2000);
       }
     });
   </script>
